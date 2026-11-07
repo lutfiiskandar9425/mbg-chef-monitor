@@ -60,11 +60,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload v1.0.0 \
-            mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk#mbg-chef-monitor.apk \
+            mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk#MBG-Chef-Monitor-SPPG.apk \
             mbg_chef_monitor/build/app/outputs/flutter-apk/mbg-chef-monitor-arm64.apk \
             --clobber || \
           gh release create v1.0.0 \
-            mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk#mbg-chef-monitor.apk \
+            mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk#MBG-Chef-Monitor-SPPG.apk \
             mbg_chef_monitor/build/app/outputs/flutter-apk/mbg-chef-monitor-arm64.apk \
             --title "MBG Chef Monitor v1.0.0" \
             --notes "Aplikasi Android MBG Chef Monitor (Release APK) siap pakai."

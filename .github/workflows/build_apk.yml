@@ -97,13 +97,17 @@ jobs:
 
       - name: Build APK Release
         working-directory: ./mbg_chef_monitor
-        run: flutter build apk --release --no-tree-shake-icons
+        run: |
+          flutter build apk --release --no-tree-shake-icons
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk
 
       - name: Upload APK Release Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mbg-kitchen-monitor-apk
-          path: mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk
+          path: |
+            mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk
+            mbg_chef_monitor/build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -112,7 +116,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk \
+          gh release upload v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk --clobber || \
+          gh release create v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk \
             --title "MBG Chef Monitor v1.0.0" \
             --notes "Aplikasi Android MBG Chef Monitor (Release APK) siap pakai." \
             --clobber || true
