@@ -1,0 +1,33 @@
+# Flutter & Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# Android
+.gradle/
+local.properties
+**/captures/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Archive & Local Builds
+archive/
+apk_output/
+*.zip
+/bgn_logo_master.png
+/logo_bgn_512.png
+
+

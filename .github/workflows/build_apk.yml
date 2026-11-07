@@ -1,0 +1,118 @@
+name: Build Android APK (MBG Kitchen Monitor)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Flutter APK (Release)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Generate Official Flutter Android Project
+        run: |
+          rm -rf mbg_chef_monitor/android
+          flutter create --org com.mbg.sppg --project-name mbg_chef_monitor mbg_chef_monitor
+          cd mbg_chef_monitor
+          
+          # 1. Set minSdkVersion to 21 for Google ML Kit
+          python3 -c "
+          import glob, re
+          for fpath in glob.glob('android/app/build.gradle*'):
+              with open(fpath, 'r') as f:
+                  c = f.read()
+              c = re.sub(r'flutter\.minSdkVersion', '21', c)
+              with open(fpath, 'w') as f:
+                  f.write(c)
+          print('Successfully replaced flutter.minSdkVersion with 21')
+          "
+
+          # 2. Create Proguard rules for ML Kit
+          cat << 'EOF' > android/app/proguard-rules.pro
+          -keepattributes *Annotation*
+          -dontwarn com.google.mlkit.**
+          -dontwarn com.google.android.gms.**
+          -keep class com.google.mlkit.** { *; }
+          -keep interface com.google.mlkit.** { *; }
+          -keep class com.google.android.gms.** { *; }
+          EOF
+
+          # 3. Configure buildTypes release to disable minification and use proguard rules
+          python3 -c "
+          import glob, re
+          for fpath in glob.glob('android/app/build.gradle*'):
+              with open(fpath, 'r') as f:
+                  c = f.read()
+              addon = '''signingConfig = signingConfigs.debug
+                  minifyEnabled false
+                  shrinkResources false
+                  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+              '''
+              c = re.sub(r'signingConfig\s*=?\s*signingConfigs\.debug', addon, c)
+              with open(fpath, 'w') as f:
+                  f.write(c)
+          print('Configured release buildTypes with minifyEnabled false and proguard-rules.pro')
+          "
+
+          # 4. Inject Camera & Internet permissions into AndroidManifest
+          python3 -c "
+          p = 'android/app/src/main/AndroidManifest.xml'
+          with open(p, 'r') as f:
+              c = f.read()
+          perms = '    <uses-permission android:name=\"android.permission.INTERNET\"/>\n    <uses-permission android:name=\"android.permission.CAMERA\"/>\n    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" android:maxSdkVersion=\"32\"/>\n    <uses-permission android:name=\"android.permission.READ_MEDIA_IMAGES\"/>\n'
+          if '<application' in c and 'android.permission.CAMERA' not in c:
+              c = c.replace('<application', perms + '    <application', 1)
+          with open(p, 'w') as f:
+              f.write(c)
+          print('Successfully injected permissions into AndroidManifest.xml')
+          "
+
+      - name: Get Flutter Dependencies
+        working-directory: ./mbg_chef_monitor
+        run: flutter pub get
+
+      - name: Build APK Release
+        working-directory: ./mbg_chef_monitor
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: Upload APK Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mbg-kitchen-monitor-apk
+          path: mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish Direct Download APK Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/app-release.apk \
+            --title "MBG Chef Monitor v1.0.0" \
+            --notes "Aplikasi Android MBG Chef Monitor (Release APK) siap pakai." \
+            --clobber || true
