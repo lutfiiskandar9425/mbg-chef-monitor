@@ -628,7 +628,7 @@
 // ========================================================
 // DATA RENCANA MENU RESMI 16 - 27 NOVEMBER 2026 (2 SIKLUS)
 // ========================================================
-const weeklyMenuCycles = {
+let weeklyMenuCycles = {
   cycle1: {
     label: "Siklus 1: 09 - 13 November 2026",
     days: {
@@ -1035,6 +1035,9 @@ function saveChefRecipeForm() {
   currentCycle = formActiveCycle;
   selectCycle(currentCycle);
   selectDay(formActiveDay);
+    try {
+    localStorage.setItem('mbg_custom_recipes', JSON.stringify(weeklyMenuCycles));
+  } catch(e) {}
   showToast('Resep ' + formActiveDay.toUpperCase() + ' (' + formActiveCycle + ') berhasil disiarkan!');
 }
 

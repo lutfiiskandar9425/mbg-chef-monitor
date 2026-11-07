@@ -51,6 +51,7 @@ class MbgWebMonitorScreen extends StatefulWidget {
 class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
+  final String _liveUrl = 'https://lutfiiskandar9425.github.io/mbg-chef-monitor/';
 
   @override
   void initState() {
@@ -75,11 +76,12 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
             }
           },
           onWebResourceError: (WebResourceError error) {
+            // Jika koneksi internet terputus, fallback otomatis ke aset offline internal
             _controller.loadFlutterAsset('assets/web/index.html');
           },
         ),
       )
-      ..loadFlutterAsset('assets/web/index.html');
+      ..loadRequest(Uri.parse(_liveUrl));
   }
 
   @override
@@ -99,7 +101,13 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
         body: SafeArea(
           child: Stack(
             children: [
-              WebViewWidget(controller: _controller),
+              RefreshIndicator(
+                color: const Color(0xFF0F172A),
+                onRefresh: () async {
+                  await _controller.reload();
+                },
+                child: WebViewWidget(controller: _controller),
+              ),
               if (_isLoading)
                 const Center(
                   child: CircularProgressIndicator(
