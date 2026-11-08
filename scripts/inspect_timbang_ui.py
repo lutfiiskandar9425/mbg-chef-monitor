@@ -10,3 +10,4 @@ print("\n=== triggerCameraOCR search ===")
 for i, line in enumerate(lines):
     if 'triggerCameraOCR' in line or 'function triggerCameraOCR' in line or 'OCR' in line:
         print(f"{i+1}: {line.strip()[:100]}")
+

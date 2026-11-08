@@ -16,3 +16,4 @@ if idx_stock != -1:
 # Check tabs
 tabs = re.findall(r'id="(tab-btn-[^"]+)"', c)
 print("\nDefined tab buttons:", tabs)
+

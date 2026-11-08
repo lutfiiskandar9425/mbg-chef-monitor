@@ -4,3 +4,4 @@ with open('preview.html', 'r', encoding='utf-8') as f:
 
 for i in range(299, 415):
     print(f"{i+1}: {lines[i]}", end='')
+

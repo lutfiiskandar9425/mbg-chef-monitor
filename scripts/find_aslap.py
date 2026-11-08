@@ -5,3 +5,4 @@ with open('preview.html', 'r', encoding='utf-8') as f:
 for i, line in enumerate(lines):
     if 'aslap' in line.lower() or 'penerimaan' in line.lower():
         print(f"{i+1}: {line.strip()[:100]}")
+

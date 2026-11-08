@@ -14,3 +14,4 @@ for i, line in enumerate(lines):
 print(f"Found {len(timbang_lines)} matching lines. Showing sample around features:")
 for lno, text in timbang_lines[:40]:
     print(f"{lno}: {text}")
+
