@@ -236,7 +236,7 @@
             <span id="note-team-icon" class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-xs">📌</span>
             <div>
               <span id="note-team-title" class="font-extrabold text-xs text-emerald-950 uppercase tracking-wide">ARAHAN RESMI CHEF LUTFI • TIM PERSIAPAN</span>
-              <p id="note-team-subtitle" class="text-[10px] text-emerald-700 font-semibold">PIC Tim: Pak Yudi & Ikbal | Total Produksi: 2.742 Porsi (13.710 Wadah)</p>
+              <p id="note-team-subtitle" class="text-[10px] text-emerald-700 font-semibold">Tim Kerja: Tim Persiapan Bahan Baku • Target Produksi: 2.742 Porsi (13.710 Wadah)</p>
             </div>
           </div>
           <div class="flex items-center gap-1.5">
@@ -249,11 +249,12 @@
         </div>
 
         <!-- SUB-TABS PANDUAN KERJA CHEF -->
-        <div id="directive-subtabs" class="grid grid-cols-4 gap-1.5 pt-2 border-t border-emerald-200/60 text-[10px] font-extrabold">
-          <button type="button" onclick="selectDirectiveSubtab('aturan')" id="subtab-btn-aturan" class="py-1.5 px-1 rounded-lg bg-emerald-700 text-white shadow-xs text-center cursor-pointer transition-all">Aturan Emas</button>
-          <button type="button" onclick="selectDirectiveSubtab('pos')" id="subtab-btn-pos" class="py-1.5 px-1 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">5 Pos Kerja</button>
-          <button type="button" onclick="selectDirectiveSubtab('jadwal')" id="subtab-btn-jadwal" class="py-1.5 px-1 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">Jadwal Mundur</button>
-          <button type="button" onclick="selectDirectiveSubtab('higiene')" id="subtab-btn-higiene" class="py-1.5 px-1 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">Higiene & SOP</button>
+        <div id="directive-subtabs" class="grid grid-cols-5 gap-1 pt-2 border-t border-emerald-200/60 text-[9px] font-extrabold">
+          <button type="button" onclick="selectDirectiveSubtab('aturan')" id="subtab-btn-aturan" class="py-1.5 px-0.5 rounded-lg bg-emerald-700 text-white shadow-xs text-center cursor-pointer transition-all">Aturan Emas</button>
+          <button type="button" onclick="selectDirectiveSubtab('bumbu')" id="subtab-btn-bumbu" class="py-1.5 px-0.5 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">Bumbu & Resep</button>
+          <button type="button" onclick="selectDirectiveSubtab('pos')" id="subtab-btn-pos" class="py-1.5 px-0.5 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">5 Pos Kerja</button>
+          <button type="button" onclick="selectDirectiveSubtab('jadwal')" id="subtab-btn-jadwal" class="py-1.5 px-0.5 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">Jadwal Mundur</button>
+          <button type="button" onclick="selectDirectiveSubtab('higiene')" id="subtab-btn-higiene" class="py-1.5 px-0.5 rounded-lg bg-white/80 hover:bg-white text-emerald-900 border border-emerald-300 text-center cursor-pointer transition-all">Higiene & SOP</button>
         </div>
 
         <div id="note-team-body" class="pt-1 text-xs text-slate-800 space-y-1.5 font-medium leading-relaxed">
@@ -721,7 +722,7 @@ let weeklyMenuCycles = {
       senin: {
         title: "Nasi + Ayam Rica-Rica (PB) / Ayam Kecap (PK) + Tahu Goreng + Tumis Putren Wortel + Jeruk",
         nutrition: "Energi 685 kkal • Protein 28 gr • Karbohidrat Kompleks & Serat",
-        notePersiapan: "PIC: Pak Yudi & Ikbal. ATURAN EMAS: (1) Ayam potong dadu seragam +-2x2 cm (12-14 g), 5 dadu/porsi. (2) Ayam PB = RICA, ayam PK = KECAP (dua baskom, dua label terpisah, jangan tertukar). (3) Tahu ditekan/dikeringkan sebelum digoreng. (4) Putren dan wortel dipotong seragam di wadah terpisah. (5) 3 siswa alergi nasi (SMK 2, MTs 1): siapkan karbo pengganti & label khusus. (6) Uji goreng 20 dadu ayam bersama Bu Ricky/Bu Linda: timbang matang per 5 dadu wajib +-60 g.",
+        notePersiapan: "ATURAN EMAS: (1) Ayam potong dadu seragam +-2x2 cm (12-14 g), 5 dadu/porsi. (2) Ayam PB = RICA, ayam PK = KECAP (dua baskom, dua label terpisah, jangan tertukar). (3) Tahu ditekan/dikeringkan sebelum digoreng. (4) Putren dan wortel dipotong seragam di wadah terpisah. (5) 3 siswa alergi nasi (SMK 2, MTs 1): siapkan karbo pengganti & label khusus. (6) Uji goreng 20 dadu ayam bersama Tim Pengolahan: timbang matang per 5 dadu wajib +-60 g.",
         notePengolahan: "Goreng dadu ayam berbalut adonan celup tipis di minyak panas 160°C (suhu inti wajib >= 75°C). Masak bumbu rica pedas sedang untuk PB (2.550 porsi) dan bumbu kecap manis gurih tanpa cabai untuk PK (192 porsi). Goreng tahu putih hingga berkulit keemasan dan kesat. Tumis putren & wortel cepat dengan bumbu harum agar tetap renyah cerah dan tidak berair menggenang.",
         notePemorsian: "TOTAL 2.742 PORSI (13.710 WADAH): SMK 1 Kedungwuni 1.712 PB (8.560 wadah), MTs Salafiyah 646 PB (3.230 wadah), Posyandu Ambokembang 185 (86 PB, 99 PK = 925 wadah), Posyandu Panjomblangan 188 (95 PB, 93 PK = 940 wadah), Sampel & Uji Organoleptik 11 PB (55 wadah). URUTAN MEMORSI: (1) Jeruk 1 buah, (2) Nasi +-100 g hangat, (3) Tumis Putren Wortel 30 g tiris, (4) Tahu Goreng 30 g kesat, (5) Ayam Rica/Kecap +-5 dadu (60 g) PALING AKHIR. Tunggu uap berkurang baru tutup wadah.",
         items: [
@@ -941,17 +942,17 @@ const schoolBatchesData = {
       }
     ],
     posKerja: [
-      { pos: "Pos Nasi", picSerah: "Rizal (Pengolahan Umum)", tugas: "Timbang beras 144,3 kg (1:1,1 air), cuci 2-3x, tiriskan. Siapkan karbo pengganti untuk 3 siswa alergi nasi (SMK 2, MTs 1).", target: "274,2 kg matang (1 kg = 19 porsi)" },
-      { pos: "Pos Ayam", picSerah: "Bu Ricky & Bu Linda (ProHe)", tugas: "Potong dadu +-2x2 cm (12-14 g), 5 dadu/porsi (PB: 12.750 dadu, PK: 960 dadu). Marinasi chiller 20-30 mnt, celup tepung. Bumbu rica & kecap.", target: "174 kg fillet mentah" },
-      { pos: "Pos Tahu", picSerah: "Faiz (ProNa)", tugas: "Timbang 10 pcs awal patokan, tekan perlahan dengan kain bersih sampai kering, potong 3x3x1,5 cm (target 30g matang), rendam air garam bawang.", target: "2.772 pcs mentah (82,26 kg matang)" },
-      { pos: "Pos Sayur", picSerah: "Abidin (Sayur)", tugas: "Kupas & potong putren serong 2,5 cm, wortel iris setengah bulan 0,4 cm. Bawang merah/putih iris. Wadah terpisah.", target: "Putren 48 kg + Wortel 48 kg" },
+      { pos: "Pos Nasi", picSerah: "Tim Pengolahan (Seksi Karbohidrat)", tugas: "Timbang beras 144,3 kg (1:1,1 air), cuci 2-3x, tiriskan. Siapkan karbo pengganti untuk 3 siswa alergi nasi (SMK 2, MTs 1).", target: "274,2 kg matang (1 kg = 19 porsi)" },
+      { pos: "Pos Ayam", picSerah: "Tim Pengolahan (Seksi Protein Hewani)", tugas: "Potong dadu +-2x2 cm (12-14 g), 5 dadu/porsi (PB: 12.750 dadu, PK: 960 dadu). Marinasi chiller 20-30 mnt, celup tepung. Bumbu rica & kecap.", target: "174 kg fillet mentah" },
+      { pos: "Pos Tahu", picSerah: "Tim Pengolahan (Seksi Protein Nabati)", tugas: "Timbang 10 pcs awal patokan, tekan perlahan dengan kain bersih sampai kering, potong 3x3x1,5 cm (target 30g matang), rendam air garam bawang.", target: "2.772 pcs mentah (82,26 kg matang)" },
+      { pos: "Pos Sayur", picSerah: "Tim Pengolahan (Seksi Sayuran)", tugas: "Kupas & potong putren serong 2,5 cm, wortel iris setengah bulan 0,4 cm. Bawang merah/putih iris. Wadah terpisah.", target: "Putren 48 kg + Wortel 48 kg" },
       { pos: "Pos Jeruk", picSerah: "Tim Pemorsian", tugas: "Hitung saat datang (242 kg isi 10-12/kg = 2.742 buah + cadangan 3%), sortir memar, lap kulit bersih kering dengan kain sanitasi.", target: "2.742 buah mulus" },
       { pos: "Pos Pemorsian", picSerah: "Driver Armada & Aslap", tugas: "Takar ompreng 5 sekat per sekolah: (1) Jeruk -> (2) Nasi hangat 100g -> (3) Tumis Putren 30g tiris -> (4) Tahu 30g kesat -> (5) Ayam Rica/Kecap terakhir.", target: "13.710 wadah dalam krat per sekolah" }
     ],
     jadwalMundur: [
-      { waktu: "T - 6 Jam", kegiatan: "Hitung & sortir jeruk. Timbang & cuci beras, masuk rice steamer. Potong ayam dadu, marinasi chiller. Uji goreng 20 dadu bersama Bu Ricky/Bu Linda (timbang matang 5 dadu harus +-60 g)." },
+      { waktu: "T - 6 Jam", kegiatan: "Hitung & sortir jeruk. Timbang & cuci beras, masuk rice steamer. Potong ayam dadu, marinasi chiller. Uji goreng 20 dadu bersama Tim Pengolahan (timbang matang 5 dadu harus +-60 g)." },
       { waktu: "T - 5 Jam", kegiatan: "Kupas dan iris putren, wortel, bawang. Potong tahu, rendam air garam bawang. Haluskan bumbu rica (PB) dan iris bumbu kecap manis (PK)." },
-      { waktu: "T - 4 Jam", kegiatan: "Serahkan semua bahan mentah siap-olah ke Tim Pengolahan (Ayam ke Bu Ricky/Linda, Tahu ke Faiz, Sayur ke Abidin, Beras ke Rizal)." },
+      { waktu: "T - 4 Jam", kegiatan: "Serahkan semua bahan mentah siap-olah ke Tim Pengolahan (Ayam ke Seksi ProHe, Tahu ke Seksi ProNa, Sayur ke Seksi Sayuran, Beras ke Seksi Karbohidrat)." },
       { waktu: "T - 1 Jam", kegiatan: "Siapkan meja pemorsian per stasiun sekolah (SMK 1, MTs, Posyandu Ambokembang, Posyandu Panjomblangan, Sampel). Hitung stok wadah dan label alergi." },
       { waktu: "T - 45 Menit", kegiatan: "Mulai pemorsian urutan standar: (1) Jeruk, (2) Nasi hangat 100g, (3) Tumis Putren Wortel 30g tiris, (4) Tahu 30g kesat, (5) Ayam Rica/Kecap 5 dadu (60g) terakhir setelah uap turun." },
       { waktu: "T - 0", kegiatan: "Pemorsian selesai, hitung ulang per krat tiap sekolah, checklist serah terima, muat ke mobil armada masing-masing." }
@@ -1014,10 +1015,10 @@ const schoolBatchesData = {
       ]}
     ],
     posKerja: [
-      { pos: "Pos Nasi", picSerah: "Rizal (Pengolahan Umum)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
-      { pos: "Pos Ayam Katsu", picSerah: "Bu Ricky & Bu Linda (ProHe)", tugas: "Pipihkan dada ayam, marinasi lada bawang putih, balur tepung panir.", target: "173 kg dada fillet" },
-      { pos: "Pos Tahu", picSerah: "Faiz (ProNa)", tugas: "Potong tahu kotak, tiriskan, rendam air garam.", target: "2.772 pcs mentah" },
-      { pos: "Pos Sayur", picSerah: "Abidin (Sayur)", tugas: "Siapkan mix vegetable jagung polong wortel bersih.", target: "70 kg sayur" },
+      { pos: "Pos Nasi", picSerah: "Tim Pengolahan (Seksi Karbohidrat)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
+      { pos: "Pos Ayam Katsu", picSerah: "Tim Pengolahan (Seksi Protein Hewani)", tugas: "Pipihkan dada ayam, marinasi lada bawang putih, balur tepung panir.", target: "173 kg dada fillet" },
+      { pos: "Pos Tahu", picSerah: "Tim Pengolahan (Seksi Protein Nabati)", tugas: "Potong tahu kotak, tiriskan, rendam air garam.", target: "2.772 pcs mentah" },
+      { pos: "Pos Sayur", picSerah: "Tim Pengolahan (Seksi Sayuran)", tugas: "Siapkan mix vegetable jagung polong wortel bersih.", target: "70 kg sayur" },
       { pos: "Pos Buah", picSerah: "Tim Pemorsian", tugas: "Sortir pisang segar matang mulus higienis.", target: "2.762 pcs pisang" },
       { pos: "Pos Pemorsian", picSerah: "Driver & Aslap", tugas: "Takar ompreng: Pisang -> Nasi -> Mix Veggie -> Tahu -> Katsu Geprek.", target: "13.710 wadah" }
     ],
@@ -1087,10 +1088,10 @@ const schoolBatchesData = {
       ]}
     ],
     posKerja: [
-      { pos: "Pos Nasi", picSerah: "Rizal (Pengolahan Umum)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
-      { pos: "Pos Fuyunghai", picSerah: "Bu Ricky & Bu Linda (ProHe)", tugas: "Kocok telur 130 kg + cincangan sayur wortel kol, racik saus asam manis.", target: "130 kg telur mentah" },
-      { pos: "Pos Tempe", picSerah: "Faiz (ProNa)", tugas: "Potong tempe 112 papan, rendam air garam bawang.", target: "112 papan tempe" },
-      { pos: "Pos Sayur", picSerah: "Abidin (Sayur)", tugas: "Iris wortel koin, kol tipis, cuci kacang polong frozen.", target: "137 kg sayur" },
+      { pos: "Pos Nasi", picSerah: "Tim Pengolahan (Seksi Karbohidrat)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
+      { pos: "Pos Fuyunghai", picSerah: "Tim Pengolahan (Seksi Protein Hewani)", tugas: "Kocok telur 130 kg + cincangan sayur wortel kol, racik saus asam manis.", target: "130 kg telur mentah" },
+      { pos: "Pos Tempe", picSerah: "Tim Pengolahan (Seksi Protein Nabati)", tugas: "Potong tempe 112 papan, rendam air garam bawang.", target: "112 papan tempe" },
+      { pos: "Pos Sayur", picSerah: "Tim Pengolahan (Seksi Sayuran)", tugas: "Iris wortel koin, kol tipis, cuci kacang polong frozen.", target: "137 kg sayur" },
       { pos: "Pos Buah", picSerah: "Tim Pemorsian", tugas: "Cuci anggur muscat air mengalir dingin, tiriskan.", target: "171 kg anggur" },
       { pos: "Pos Pemorsian", picSerah: "Driver & Aslap", tugas: "Takar: Anggur -> Nasi -> Tumis -> Tempe -> Fuyunghai + saus.", target: "13.710 wadah" }
     ],
@@ -1159,10 +1160,10 @@ const schoolBatchesData = {
       ]}
     ],
     posKerja: [
-      { pos: "Pos Nasi", picSerah: "Rizal (Pengolahan Umum)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
-      { pos: "Pos Lele", picSerah: "Bu Ricky & Bu Linda (ProHe)", tugas: "Bersihkan perut lele 278 kg, kerat badan, marinasi bumbu kunyit, balur tepung renyah.", target: "278 kg lele utuh" },
-      { pos: "Pos Edamame", picSerah: "Faiz (ProNa)", tugas: "Sortir polong edamame 60 kg, rebus air garam 5 menit.", target: "60 kg edamame" },
-      { pos: "Pos Kakiage", picSerah: "Abidin (Sayur)", tugas: "Iris wortel & kol korek api halus, campur adonan tepung encer es.", target: "85 kg sayur" },
+      { pos: "Pos Nasi", picSerah: "Tim Pengolahan (Seksi Karbohidrat)", tugas: "Timbang beras 150 kg, cuci bersih, masak pulen.", target: "274,2 kg matang" },
+      { pos: "Pos Lele", picSerah: "Tim Pengolahan (Seksi Protein Hewani)", tugas: "Bersihkan perut lele 278 kg, kerat badan, marinasi bumbu kunyit, balur tepung renyah.", target: "278 kg lele utuh" },
+      { pos: "Pos Edamame", picSerah: "Tim Pengolahan (Seksi Protein Nabati)", tugas: "Sortir polong edamame 60 kg, rebus air garam 5 menit.", target: "60 kg edamame" },
+      { pos: "Pos Kakiage", picSerah: "Tim Pengolahan (Seksi Sayuran)", tugas: "Iris wortel & kol korek api halus, campur adonan tepung encer es.", target: "85 kg sayur" },
       { pos: "Pos Buah", picSerah: "Tim Pemorsian", tugas: "Sortir kelengkeng manis segar utuh.", target: "120 kg kelengkeng" },
       { pos: "Pos Pemorsian", picSerah: "Driver & Aslap", tugas: "Takar: Kelengkeng -> Nasi -> Kakiage -> Edamame -> Lele Crispy + Sambal.", target: "13.710 wadah" }
     ],
@@ -1230,10 +1231,10 @@ const schoolBatchesData = {
       ]}
     ],
     posKerja: [
-      { pos: "Pos Nasi", picSerah: "Rizal (Pengolahan Umum)", tugas: "Timbang beras 103 kg, cuci bersih, masak pulen.", target: "209,4 kg matang" },
-      { pos: "Pos Ayam Crispy", picSerah: "Bu Ricky & Bu Linda (ProHe)", tugas: "Potong dada fillet 132 kg, marinasi, balur tepung keriting renyah.", target: "132 kg dada fillet" },
-      { pos: "Pos Tempe", picSerah: "Faiz (ProNa)", tugas: "Potong tempe 85 papan seragam, rendam air garam bawang.", target: "85 papan tempe" },
-      { pos: "Pos Sayur", picSerah: "Abidin (Sayur)", tugas: "Siapkan mix vegetable jagung polong wortel segar.", target: "60 kg sayur" },
+      { pos: "Pos Nasi", picSerah: "Tim Pengolahan (Seksi Karbohidrat)", tugas: "Timbang beras 103 kg, cuci bersih, masak pulen.", target: "209,4 kg matang" },
+      { pos: "Pos Ayam Crispy", picSerah: "Tim Pengolahan (Seksi Protein Hewani)", tugas: "Potong dada fillet 132 kg, marinasi, balur tepung keriting renyah.", target: "132 kg dada fillet" },
+      { pos: "Pos Tempe", picSerah: "Tim Pengolahan (Seksi Protein Nabati)", tugas: "Potong tempe 85 papan seragam, rendam air garam bawang.", target: "85 papan tempe" },
+      { pos: "Pos Sayur", picSerah: "Tim Pengolahan (Seksi Sayuran)", tugas: "Siapkan mix vegetable jagung polong wortel segar.", target: "60 kg sayur" },
       { pos: "Pos Buah", picSerah: "Tim Pemorsian", tugas: "Cuci anggur red globe air mengalir dingin, tiriskan.", target: "97 kg anggur" },
       { pos: "Pos Pemorsian", picSerah: "Driver & Aslap", tugas: "Takar: Anggur -> Nasi -> Tumis -> Tempe -> Ayam Crispy Sambal Bajak.", target: "10.470 wadah" }
     ],
@@ -1528,7 +1529,7 @@ function openFullDirectiveModal() {
     '<h1 class="text-base md:text-lg font-black uppercase text-slate-900">SPPG PEKAJANGAN 04 - PROGRAM MAKAN BERGIZI GRATIS (MBG)</h1>' +
     '<h2 class="text-xs md:text-sm font-bold text-emerald-800 uppercase">Dokumen Resmi Panduan & Arahan Kerja - ' + dayBatch.title + '</h2>' +
     '<p class="text-xs text-slate-600 font-medium">Menu: <strong class="text-slate-800">' + dayBatch.menu + '</strong></p>' +
-    '<p class="text-[11px] text-slate-500 font-medium">PIC Tim Persiapan: <strong class="text-slate-800">Pak Yudi, Ikbal</strong> • Total Produksi: <strong class="text-emerald-800 font-bold">2.742 Porsi (13.710 Wadah)</strong></p>' +
+    '<p class="text-[11px] text-slate-500 font-medium">PIC Tim Persiapan: <strong class="text-slate-800">Tim Persiapan</strong> • Total Produksi: <strong class="text-emerald-800 font-bold">2.742 Porsi (13.710 Wadah)</strong></p>' +
   '</div>';
 
   // Section 1: Aturan Emas
@@ -1563,10 +1564,66 @@ function openFullDirectiveModal() {
         '<tr class="bg-slate-50 font-black text-slate-900"><td class="p-2">TOTAL PRODUKSI</td><td class="p-2 text-center font-mono-num">2.550</td><td class="p-2 text-center font-mono-num">192</td><td class="p-2 text-center font-mono-num text-emerald-800">2.742</td><td class="p-2 text-center font-mono-num text-emerald-900">13.710</td><td class="p-2">Semua titik teralokasi lengkap</td></tr>' +
       '</tbody></table></div></div>';
 
-  // Section 3: Pos Kerja & Alur Serah Terima
+  // Section 3: Detail Bumbu & Resep Pengolahan
   html += '<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">' +
     '<div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">' +
-      '<span class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">3</span>' +
+      '<span class="w-6 h-6 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">3</span>' +
+      '<h3 class="text-xs md:text-sm font-black text-slate-900 uppercase">Panduan Detail Bumbu & Resep Pengolahan (SOP Relawan MBG)</h3>' +
+    '</div>' +
+    '<div class="space-y-3 text-xs text-slate-800">' +
+      '<div class="p-3 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">' +
+        '<div class="flex items-center justify-between border-b border-rose-200 pb-1">' +
+          '<span class="font-black text-rose-950 text-xs">🍗 1. AYAM RICA-RICA (PB 2.550 PORSI - PEDAS SEDANG)</span>' +
+          '<span class="text-[9px] font-bold bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Baskom PB • Label RICA</span>' +
+        '</div>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Potong Dadu:</strong> 12.750 dadu seragam ±2x2 cm (12-14 g/dadu, tepat 5 dadu per porsi). Timbang 10 dadu pertama sebagai acuan.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Marinasi Chiller:</strong> Balur bawang putih halus + garam + lada bubuk. Diamkan 20-30 menit di chiller pendingin.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Adonan Celup:</strong> Terigu + maizena + air dingin + garam sampai tekstur seperti cat kental (menempel tipis di sendok).</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Halus Rica:</strong> Haluskan bawang merah 8,2 kg, cabai merah keriting 9,8 kg, cabai rawit 2,9 kg, tomat 3,9 kg, bawang putih 3,1 kg, jahe & kunyit 2,4 kg.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Aromatik:</strong> Memarkan 49 batang serai, siapkan daun jeruk purut (buang tulang daun agar tidak pahit).</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Cara Masak:</strong> Goreng ayam dadu tepung suhu 160°C hingga matang (suhu inti >= 75°C). Tumis bumbu halus bersama serai dan daun jeruk sampai tanak berminyak dan harum gurih. Masukkan ayam, aduk cepat meresap dan tidak berair.</p>' +
+      '</div>' +
+      '<div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1.5">' +
+        '<div class="flex items-center justify-between border-b border-blue-200 pb-1">' +
+          '<span class="font-black text-blue-950 text-xs">🍗 2. AYAM KECAP MANIS (PK BALITA 192 PORSI - TANPA CABAI)</span>' +
+          '<span class="text-[9px] font-bold bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Baskom PK • Label KECAP</span>' +
+        '</div>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Potong Dadu:</strong> 960 dadu seragam ±2x2 cm (5 dadu per porsi). Simpan di baskom terpisah dari PB!</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Racikan Bumbu:</strong> Iris tipis bawang merah, cincang halus bawang putih, sisir gula merah 0,3 kg, kecap manis 1,2 L, sedikit garam & air. <strong class="text-rose-700 underline">MUTLAK TANPA CABAI!</strong></p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Cara Masak:</strong> Goreng ayam dadu hingga matang empuk. Tumis bawang hingga harum, masukkan kecap, gula merah, garam dan air. Masak hingga mengental karamel gurih meresap.</p>' +
+      '</div>' +
+      '<div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">' +
+        '<div class="flex items-center justify-between border-b border-amber-200 pb-1">' +
+          '<span class="font-black text-amber-950 text-xs">🧈 3. TAHU GORENG GURIH (2.742 POTONG MATANG)</span>' +
+          '<span class="text-[9px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Seksi Protein Nabati</span>' +
+        '</div>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Tiris & Tekan Kering:</strong> Buang air rendaman pabrik. Tekan perlahan dengan kain bersih sampai permukaan kering dan kesat agar minyak panas tidak muncrat/meletup.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Potong:</strong> Ukuran seragam ±3x3x1,5 cm (target 33 g mentah -> 30 g matang susut 10%).</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Rendam & Goreng:</strong> Rendam 5 menit di air garam encer + bawang putih bubuk, tiriskan lagi. Goreng suhu 160°C sampai kuning keemasan dan kesat.</p>' +
+      '</div>' +
+      '<div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">' +
+        '<div class="flex items-center justify-between border-b border-emerald-200 pb-1">' +
+          '<span class="font-black text-emerald-950 text-xs">🥕 4. TUMIS PUTREN WORTEL (PUTREN 48 KG + WORTEL 48 KG)</span>' +
+          '<span class="text-[9px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Seksi Sayuran</span>' +
+        '</div>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Potong:</strong> Putren kupas kelobot & rambut, belah dua memanjang, potong serong 2,5 cm. Wortel kupas, iris setengah bulan tipis 0,4 cm.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Tumis:</strong> Iris tipis bawang merah dan bawang putih. Simpan di wadah terpisah.</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Teknik Masak Cepat (Stir-fry):</strong> Tumis bawang hingga harum. Masukkan wortel dulu, lalu putren. Masak api besar secara cepat agar sayur tetap empuk renyah dan warna cerah. Tiriskan kuah sebelum diporsi.</p>' +
+      '</div>' +
+      '<div class="p-3 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1.5">' +
+        '<div class="flex items-center justify-between border-b border-purple-200 pb-1">' +
+          '<span class="font-black text-purple-950 text-xs">🍚 5. NASI & ALERGI (144,3 KG BERAS / 150 KG PO)</span>' +
+          '<span class="text-[9px] font-bold bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full">Seksi Karbohidrat</span>' +
+        '</div>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• Cuci & Masak:</strong> Cuci beras 2-3 kali air mengalir sampai jernih, jangan digosok keras. Rasio air 1 : 1,1 - 1,2. Masak di rice steamer hingga pulen mekar (1 kg beras = 19 porsi).</p>' +
+        '<p class="text-[11px] leading-relaxed"><strong>• 3 Siswa Alergi Nasi:</strong> Kukus kentang ±150 g, wadah terpisah stiker khusus ALERGI NASI (SMK 2 siswa, MTs 1 siswa).</p>' +
+      '</div>' +
+    '</div></div>';
+
+  // Section 4: Pos Kerja & Alur Serah Terima
+  html += '<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">' +
+    '<div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">' +
+      '<span class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">4</span>' +
       '<h3 class="text-xs md:text-sm font-black text-slate-900 uppercase">Alur 5 Pos Kerja Persiapan & Serah Terima ke Pengolahan</h3>' +
     '</div>' +
     '<div class="space-y-2">';
@@ -1582,10 +1639,10 @@ function openFullDirectiveModal() {
   });
   html += '</div></div>';
 
-  // Section 4: Jadwal Mundur Timeline
+  // Section 5: Jadwal Mundur Timeline
   html += '<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">' +
     '<div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">' +
-      '<span class="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">4</span>' +
+      '<span class="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">5</span>' +
       '<h3 class="text-xs md:text-sm font-black text-slate-900 uppercase">Jadwal Mundur Produksi (Timeline Dapur)</h3>' +
     '</div>' +
     '<div class="space-y-2 text-xs">';
@@ -1597,7 +1654,7 @@ function openFullDirectiveModal() {
   });
   html += '</div></div>';
 
-  // Section 5: SOP & Higiene
+  // Section 6: SOP & Higiene
   html += '<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5 text-xs text-slate-800 leading-relaxed">' +
     '<h3 class="text-xs md:text-sm font-black text-rose-900 uppercase border-b border-slate-100 pb-2">Standar Higiene & Larangan Mutlak BGN</h3>' +
     '<p>• Cuci tangan pakai sabun minimal 20 detik sebelum mulai, setelah memegang ayam mentah, dan setiap pindah stasiun kerja.</p>' +
@@ -1761,7 +1818,7 @@ function updateStickyNoteContent() {
   if (!stickyNote || !title || !body || !cur) return;
 
   // Update Subtabs styling
-  const subtabs = ['aturan', 'pos', 'jadwal', 'higiene'];
+  const subtabs = ['aturan', 'bumbu', 'pos', 'jadwal', 'higiene'];
   subtabs.forEach(st => {
     const btn = document.getElementById('subtab-btn-' + st);
     if (!btn) return;
@@ -1784,14 +1841,69 @@ function updateStickyNoteContent() {
   if (currentActiveStation === 'persiapan') {
     stickyNote.className = 'note-paper-persiapan p-3.5 rounded-2xl transition-all shadow-xs space-y-2.5';
     title.innerText = 'ARAHAN UTAMA TIM PERSIAPAN (' + currentDay.toUpperCase() + ')';
-    if (subtitle) subtitle.innerText = 'PIC Tim: Pak Yudi & Ikbal | Total Produksi: 2.742 Porsi (13.710 Wadah)';
+    if (subtitle) subtitle.innerText = 'Tim Kerja: Tim Persiapan Bahan Baku • Target Produksi: 2.742 Porsi (13.710 Wadah)';
     if (badge) {
       badge.innerText = 'Langsung Aktif';
       badge.className = 'text-[9px] font-bold bg-white text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200 shadow-2xs';
     }
     if (icon) icon.className = 'w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-xs';
 
-    if (currentDirectiveSubtab === 'aturan') {
+    if (currentDirectiveSubtab === 'bumbu') {
+      let bumbuHtml = '<div class="space-y-2 text-xs text-slate-800">' +
+        '<div class="p-2.5 bg-white/90 border border-rose-200 rounded-xl space-y-1.5 shadow-2xs">' +
+          '<div class="flex items-center justify-between border-b border-rose-100 pb-1">' +
+            '<span class="font-black text-rose-950 text-xs">🍗 1. AYAM RICA-RICA (PB 2.550 PORSI - PEDAS SEDANG)</span>' +
+            '<span class="text-[9px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full">Baskom PB • Label RICA</span>' +
+          '</div>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Potong Dadu:</strong> 12.750 dadu seragam +-2x2 cm (12-14 gram/dadu, tepat 5 dadu per porsi). Timbang 10 dadu pertama sebagai acuan.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Marinasi Chiller:</strong> Balur bawang putih halus + garam + lada bubuk. Diamkan 20-30 menit di dalam chiller pendingin.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Adonan Celup:</strong> Terigu + maizena + air dingin + garam sampai tekstur seperti cat kental (menempel tipis di sendok).</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Halus Rica:</strong> Haluskan bawang merah 8,2 kg, cabai merah keriting 9,8 kg, cabai rawit 2,9 kg, tomat 3,9 kg, bawang putih 3,1 kg, jahe & kunyit 2,4 kg.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Aromatik:</strong> Memarkan 49 batang serai, siapkan daun jeruk purut (buang tulang daun agar tidak pahit).</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Cara Masak:</strong> Goreng ayam dadu tepung suhu 160°C hingga matang (suhu inti >= 75°C). Tumis bumbu halus bersama serai dan daun jeruk sampai tanak berminyak dan harum gurih. Masukkan ayam, aduk cepat meresap dan tidak berair.</p>' +
+        '</div>' +
+
+        '<div class="p-2.5 bg-white/90 border border-blue-200 rounded-xl space-y-1.5 shadow-2xs">' +
+          '<div class="flex items-center justify-between border-b border-blue-100 pb-1">' +
+            '<span class="font-black text-blue-950 text-xs">🍗 2. AYAM KECAP MANIS (PK BALITA 192 PORSI - TANPA CABAI)</span>' +
+            '<span class="text-[9px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Baskom PK • Label KECAP</span>' +
+          '</div>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Potong Dadu:</strong> 960 dadu seragam +-2x2 cm (5 dadu per porsi). Simpan di baskom terpisah dari PB!</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Racikan Bumbu:</strong> Iris tipis bawang merah, cincang halus bawang putih, sisir gula merah 0,3 kg, kecap manis 1,2 L, sedikit garam & air. <strong class="text-rose-700 underline">MUTLAK TANPA CABAI!</strong></p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Cara Masak:</strong> Goreng ayam dadu hingga matang empuk. Tumis bawang hingga harum, masukkan kecap, gula merah, garam dan air. Masak hingga mengental karamel gurih meresap.</p>' +
+        '</div>' +
+
+        '<div class="p-2.5 bg-white/90 border border-amber-200 rounded-xl space-y-1.5 shadow-2xs">' +
+          '<div class="flex items-center justify-between border-b border-amber-100 pb-1">' +
+            '<span class="font-black text-amber-950 text-xs">🧈 3. TAHU GORENG GURIH (2.742 POTONG MATANG)</span>' +
+            '<span class="text-[9px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Seksi Protein Nabati</span>' +
+          '</div>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Tiris & Tekan Kering:</strong> Buang air rendaman pabrik. Tekan perlahan dengan kain bersih sampai permukaan kering dan kesat agar minyak panas tidak muncrat/meletup.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Potong:</strong> Ukuran seragam +-3x3x1,5 cm (target 33 g mentah -> 30 g matang susut 10%).</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Rendam & Goreng:</strong> Rendam 5 menit di air garam encer + bawang putih bubuk, tiriskan lagi. Goreng suhu 160°C sampai kuning keemasan dan kesat.</p>' +
+        '</div>' +
+
+        '<div class="p-2.5 bg-white/90 border border-emerald-200 rounded-xl space-y-1.5 shadow-2xs">' +
+          '<div class="flex items-center justify-between border-b border-emerald-100 pb-1">' +
+            '<span class="font-black text-emerald-950 text-xs">🥕 4. TUMIS PUTREN WORTEL (PUTREN 48 KG + WORTEL 48 KG)</span>' +
+            '<span class="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Seksi Sayuran</span>' +
+          '</div>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Potong:</strong> Putren kupas kelobot & rambut, belah dua memanjang, potong serong 2,5 cm. Wortel kupas, iris setengah bulan tipis 0,4 cm.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Bumbu Tumis:</strong> Iris tipis bawang merah dan bawang putih. Simpan di wadah terpisah.</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Teknik Masak Cepat (Stir-fry):</strong> Tumis bawang hingga harum. Masukkan wortel dulu, lalu putren. Masak api besar secara cepat agar sayur tetap empuk renyah dan warna cerah. Tiriskan kuah sebelum diporsi.</p>' +
+        '</div>' +
+
+        '<div class="p-2.5 bg-white/90 border border-purple-200 rounded-xl space-y-1.5 shadow-2xs">' +
+          '<div class="flex items-center justify-between border-b border-purple-100 pb-1">' +
+            '<span class="font-black text-purple-950 text-xs">🍚 5. NASI & ALERGI (144,3 KG BERAS / 150 KG PO)</span>' +
+            '<span class="text-[9px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">Seksi Karbohidrat</span>' +
+          '</div>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• Cuci & Masak:</strong> Cuci beras 2-3 kali air mengalir sampai jernih, jangan digosok keras. Rasio air 1 : 1,1 - 1,2. Masak di rice steamer hingga pulen mekar (1 kg beras = 19 porsi).</p>' +
+          '<p class="text-[11px] leading-relaxed"><strong>• 3 Siswa Alergi Nasi:</strong> Kukus kentang +-150 g, wadah terpisah stiker khusus ALERGI NASI (SMK 2 siswa, MTs 1 siswa).</p>' +
+        '</div>' +
+      '</div>';
+      body.innerHTML = bumbuHtml;
+    } else if (currentDirectiveSubtab === 'aturan') {
       let aturanHtml = '<div class="space-y-1.5"><p class="font-extrabold text-emerald-950 text-xs">7 Aturan Emas Tim Persiapan Hari Ini:</p><div class="grid grid-cols-1 gap-1 text-[11px]">';
       (dayBatch.aturanEmas || []).forEach((at, idx) => {
         aturanHtml += '<div class="flex items-start gap-1.5 bg-white/70 p-1.5 rounded-lg border border-emerald-200/60">' +
@@ -1832,7 +1944,7 @@ function updateStickyNoteContent() {
   } else if (currentActiveStation === 'pengolahan') {
     stickyNote.className = 'note-paper-pengolahan p-3.5 rounded-2xl transition-all shadow-xs space-y-2.5';
     title.innerText = 'ARAHAN RESMI CHEF LUTFI • TIM PENGOLAHAN (' + currentDay.toUpperCase() + ')';
-    if (subtitle) subtitle.innerText = 'PIC Tim: Bu Ricky, Bu Linda, Faiz, Abidin | Masak & Uji Suhu Inti >= 75°C';
+    if (subtitle) subtitle.innerText = 'Tim Kerja: Tim Pengolahan (Masak) • Standar Suhu Inti >= 75°C';
     if (badge) {
       badge.innerText = 'Suhu Inti 75°C';
       badge.className = 'text-[9px] font-bold bg-white text-amber-800 px-2 py-0.5 rounded-md border border-amber-200 shadow-2xs';
@@ -1842,7 +1954,7 @@ function updateStickyNoteContent() {
     body.innerHTML = '<div class="space-y-1 text-xs text-amber-950 font-medium">' +
       '<p class="font-bold text-amber-950">Pedoman Suhu & Standar Bumbu Masak:</p>' +
       '<p>• ' + cur.notePengolahan + '</p>' +
-      '<p>• <strong>Uji Goreng 20 Dadu Ayam:</strong> Timbang matang per 5 dadu harus tepat +-60 g bersama Pak Yudi sebelum seluruh ayam digoreng.</p>' +
+      '<p>• <strong>Uji Goreng 20 Dadu Ayam:</strong> Timbang matang per 5 dadu harus tepat +-60 g bersama Tim Persiapan sebelum seluruh ayam digoreng.</p>' +
       '<p>• <strong>Standar Keamanan Pangan:</strong> Suhu inti daging ayam matang WAJIB minimal 75°C (cek berkala dengan termometer tusuk digital).</p>' +
       '<p>• <strong>Pemisahan Rasa:</strong> Ayam Rica (PB 2.550 porsi) pedas sedang, Ayam Kecap (PK 192 porsi balita) manis gurih TANPA cabai.</p>' +
     '</div>';
