@@ -48,14 +48,16 @@ class MbgWebMonitorScreen extends StatefulWidget {
   State<MbgWebMonitorScreen> createState() => _MbgWebMonitorScreenState();
 }
 
-class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
+class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsBindingObserver {
   late final WebViewController _controller;
   bool _isLoading = true;
-  final String _liveUrl = 'https://lutfiiskandar9425.github.io/mbg-chef-monitor/';
+  final String _baseUrl = 'https://lutfiiskandar9425.github.io/mbg-chef-monitor/';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFFF8FAFC))
@@ -80,8 +82,43 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
             _controller.loadFlutterAsset('assets/web/index.html');
           },
         ),
-      )
-      ..loadRequest(Uri.parse(_liveUrl));
+      );
+
+    _loadFreshUrl();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Otomatis refresh saat aplikasi dibuka kembali dari background
+    if (state == AppLifecycleState.resumed) {
+      _refreshData();
+    }
+  }
+
+  Future<void> _loadFreshUrl() async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final freshUrl = '$_baseUrl?v=$timestamp';
+    await _controller.loadRequest(Uri.parse(freshUrl));
+  }
+
+  Future<void> _refreshData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _controller.clearCache();
+      await _controller.clearLocalStorage();
+    } catch (_) {}
+
+    await _loadFreshUrl();
   }
 
   @override
@@ -103,15 +140,16 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> {
             children: [
               RefreshIndicator(
                 color: const Color(0xFF0F172A),
-                onRefresh: () async {
-                  await _controller.reload();
-                },
+                onRefresh: _refreshData,
                 child: WebViewWidget(controller: _controller),
               ),
               if (_isLoading)
-                const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF0F172A),
+                Container(
+                  color: Colors.white.withOpacity(0.4),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF0F172A),
+                    ),
                   ),
                 ),
             ],
