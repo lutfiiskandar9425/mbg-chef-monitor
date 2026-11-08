@@ -17,3 +17,4 @@ for t in targets:
     print(f"Copied to: {t} (Size: {os.path.getsize(t)} bytes)")
 
 print("All preview files synchronized successfully!")
+

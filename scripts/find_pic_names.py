@@ -10,3 +10,4 @@ for fpath in files:
         for idx, line in enumerate(f, start=1):
             if pattern.search(line):
                 print(f'{idx}: {line.strip()[:110]}')
+

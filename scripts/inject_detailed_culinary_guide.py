@@ -11,3 +11,4 @@ import os
 import re
 
 print("Starting injection of detailed culinary guide and removal of PIC names...")
+

@@ -29,3 +29,4 @@ files.forEach(fp => {
 
   fs.writeFileSync(fp, content, 'utf8');
 });
+

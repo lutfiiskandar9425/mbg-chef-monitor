@@ -140,3 +140,4 @@ files = ['preview.html', 'index.html', 'mbg_chef_monitor/assets/web/index.html']
 for fp in files:
     if os.path.exists(fp):
         process_file(fp)
+
