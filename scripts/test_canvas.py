@@ -63,3 +63,4 @@ function generateSampleScalePhoto(weightStr) {
 }
 """
 print("Sample scale generator defined.")
+

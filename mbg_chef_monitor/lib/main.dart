@@ -104,6 +104,14 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
   Future<void> _loadFreshUrl() async {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final freshUrl = '$_baseUrl?v=$timestamp';
+    // Timeout pengaman agar loading indikator tidak macet di HP
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
     await _controller.loadRequest(Uri.parse(freshUrl));
   }
 
