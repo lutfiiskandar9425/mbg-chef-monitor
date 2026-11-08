@@ -63,6 +63,9 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
       ..setBackgroundColor(const Color(0xFFF8FAFC))
       ..setNavigationDelegate(
         NavigationDelegate(
+          onPlatformPermissionRequest: (PlatformPermissionRequest request) {
+            request.grant();
+          },
           onPageStarted: (String url) {
             if (mounted) {
               setState(() {
@@ -146,18 +149,16 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
         body: SafeArea(
           child: Stack(
             children: [
-              RefreshIndicator(
-                color: const Color(0xFF0F172A),
-                onRefresh: _refreshData,
-                child: WebViewWidget(controller: _controller),
-              ),
+              WebViewWidget(controller: _controller),
               if (_isLoading)
-                Container(
-                  color: Colors.white.withOpacity(0.4),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF0F172A),
-                    ),
+                const Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(
+                    minHeight: 3,
+                    color: Color(0xFF059669),
+                    backgroundColor: Colors.transparent,
                   ),
                 ),
             ],

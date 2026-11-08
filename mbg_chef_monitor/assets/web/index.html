@@ -351,38 +351,27 @@
           <p id="scale-subtext" class="text-xs text-slate-400 mt-1 font-semibold">Netto Bersih Bahan Siap Olah</p>
         </div>
 
-                                <!-- REAL CAMERA CAPTURE INPUTS & DIRECT BUTTONS -->
+                                        <!-- BUKTI FOTO TIMBANGAN (SIMPEL & ELEGAN) -->
         <div class="pt-3 border-t border-slate-800/80 space-y-2">
-          <div class="grid grid-cols-2 gap-2">
-            <!-- Tombol Buka Kamera (Nested Input Langsung) -->
-            <label class="py-2.5 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-extrabold shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 select-none">
-              <input type="file" id="scale-camera-input" accept="image/*" capture="environment" class="sr-only" onchange="handleScalePhoto(event)">
+          <!-- Input File Tersembunyi (Standar Browser & Seluler) -->
+          <input type="file" id="scale-camera-input" accept="image/*" style="display: none;" onchange="handleScalePhoto(event)">
+
+          <!-- Tombol Aksi Foto (Tampil Saat Belum Ada Foto) -->
+          <div id="scale-photo-action-buttons" class="grid grid-cols-2 gap-2">
+            <!-- Tombol 1: Buka Kamera / Galeri -->
+            <button type="button" onclick="triggerDirectCameraUpload()" class="py-2.5 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               <span>Buka Kamera (Foto)</span>
-            </label>
-
-            <!-- Tombol Pilih dari Galeri (Nested Input Langsung) -->
-            <label class="py-2.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 select-none">
-              <input type="file" id="scale-gallery-input" accept="image/*" class="sr-only" onchange="handleScalePhoto(event)">
-              <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>Pilih dari Galeri</span>
-            </label>
-          </div>
-
-          <!-- Tombol Foto Indikator Digital (Solusi 1-Tap Tanpa Hambatan) & Kamera Live -->
-          <div class="grid grid-cols-2 gap-2 pt-0.5">
-            <button type="button" onclick="useDigitalScaleSamplePhoto()" class="py-2 px-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-[11px] font-extrabold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
-              <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-              <span>Foto Indikator Digital</span>
             </button>
 
-            <button type="button" onclick="openCameraOptionsModal()" class="py-2 px-2 bg-slate-800/80 hover:bg-slate-800 text-teal-300 border border-slate-700 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
-              <svg class="w-3.5 h-3.5 text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-              <span>Kamera Live (Webcam)</span>
+            <!-- Tombol 2: Foto Digital Cepat (1-Sentuhan) -->
+            <button type="button" onclick="useDigitalScaleSamplePhoto()" class="py-2.5 px-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
+              <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              <span>Foto Digital Cepat</span>
             </button>
           </div>
 
-          <!-- CONTAINER PREVIEW FOTO BUKTI TIMBANGAN -->
+          <!-- CONTAINER PREVIEW FOTO BUKTI TIMBANGAN (Tampil Saat Sudah Ada Foto) -->
           <div id="scale-photo-preview-container" class="hidden bg-slate-900/90 border border-emerald-500/40 p-2.5 rounded-2xl flex items-center justify-between gap-3 text-left">
             <div class="flex items-center gap-2.5 overflow-hidden">
               <img id="scale-photo-preview-img" src="" alt="Bukti Foto Timbangan" onclick="viewCurrentPhotoModal()" class="w-14 h-14 object-cover rounded-xl border border-emerald-400/50 shadow-sm cursor-pointer hover:opacity-90 shrink-0">
@@ -396,8 +385,8 @@
               </div>
             </div>
             <div class="flex flex-col gap-1 shrink-0">
-              <button type="button" onclick="viewCurrentPhotoModal()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-[10px] font-bold rounded-lg border border-slate-700 cursor-pointer">Lihat</button>
-              <button type="button" onclick="removeScalePhoto()" class="px-2 py-1 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-[10px] font-bold rounded-lg border border-rose-800/50 cursor-pointer">Hapus</button>
+              <button type="button" onclick="viewCurrentPhotoModal()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-[10px] font-bold rounded-lg border border-slate-700 cursor-pointer">Lihat</button>
+              <button type="button" onclick="removeScalePhoto()" class="px-2.5 py-1 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-[10px] font-bold rounded-lg border border-rose-800/50 cursor-pointer">Hapus</button>
             </div>
           </div>
         </div>
@@ -677,68 +666,7 @@
     </div>
   </div>
 
-        <!-- MODAL PILIHAN SUMBER FOTO TIMBANGAN (ACTION SHEET) -->
-  <div id="camera-options-modal" class="fixed inset-0 bg-slate-950/80 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden no-print" onclick="closeCameraOptionsModal(event)">
-    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm p-5 shadow-2xl border border-slate-200 space-y-4 text-left" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-        <div>
-          <h3 class="text-xs font-black uppercase text-slate-900 tracking-wide">Pilih Metode Bukti Foto Timbangan</h3>
-          <p class="text-[10px] text-slate-500">Pilih metode pengambilan dokumentasi fisik</p>
-        </div>
-        <button type="button" onclick="closeCameraOptionsModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
-      </div>
-
-      <div class="space-y-2 text-xs">
-        <!-- Opsi 1: Kamera HP (Native Nested) -->
-        <label class="w-full p-3 bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 rounded-2xl flex items-center gap-3 cursor-pointer transition-all">
-          <input type="file" accept="image/*" capture="environment" class="sr-only" onchange="closeCameraOptionsModal(); handleScalePhoto(event);">
-          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <span class="font-extrabold text-slate-900 block text-xs">Kamera HP (Rana Belakang)</span>
-            <span class="text-[10px] text-slate-500">Langsung membuka kamera iPhone / Android Anda</span>
-          </div>
-        </label>
-
-        <!-- Opsi 2: Galeri / File (Nested) -->
-        <label class="w-full p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl flex items-center gap-3 cursor-pointer transition-all">
-          <input type="file" accept="image/*" class="sr-only" onchange="closeCameraOptionsModal(); handleScalePhoto(event);">
-          <div class="w-10 h-10 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <span class="font-extrabold text-slate-900 block text-xs">Pilih Foto dari Galeri / Album</span>
-            <span class="text-[10px] text-slate-500">Pilih berkas foto timbangan yang sudah tersimpan</span>
-          </div>
-        </label>
-
-        <!-- Opsi 3: Live In-App Camera Viewfinder -->
-        <button type="button" onclick="startInAppLiveCamera()" class="w-full p-3 bg-teal-50/70 hover:bg-teal-100/70 border border-teal-200 rounded-2xl flex items-center gap-3 cursor-pointer transition-all text-left">
-          <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <span class="font-extrabold text-slate-900 block text-xs">Kamera Live di Peramban (Webcam)</span>
-            <span class="text-[10px] text-slate-500">Tampilkan jendela video live langsung di layar</span>
-          </div>
-        </button>
-
-        <!-- Opsi 4: Simulasi Foto Timbangan Digital -->
-        <button type="button" onclick="useDigitalScaleSamplePhoto()" class="w-full p-3 bg-amber-50/70 hover:bg-amber-100/70 border border-amber-200 rounded-2xl flex items-center gap-3 cursor-pointer transition-all text-left">
-          <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <span class="font-extrabold text-slate-900 block text-xs">Gunakan Foto Indikator Digital (Cepat)</span>
-            <span class="text-[10px] text-slate-500">Otomatis buat foto bukti timbangan digital sesuai angka saat ini</span>
-          </div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL LIVE IN-APP CAMERA VIEWFINDER -->
+        <!-- MODAL LIVE IN-APP CAMERA VIEWFINDER -->
   <div id="live-camera-modal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-3 hidden no-print" onclick="closeLiveCameraModal()">
     <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col text-left" onclick="event.stopPropagation()">
       <div class="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
@@ -845,11 +773,7 @@
     </div>
   </div>
 
-    <!-- FLOATING QUICK REFRESH BUTTON (ALWAYS ACCESSIBLE WITH 1 THUMB TAP) -->
-  <button onclick="forceRefreshApp()" id="floating-refresh-btn" class="fixed bottom-20 right-4 z-40 bg-slate-900 text-white px-3.5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-700 hover:bg-black active:scale-90 transition-all cursor-pointer no-print" title="Tarik pembaruan menu & arahan terbaru seketika">
-    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-    <span class="text-xs font-black tracking-wide">Refresh Data</span>
-  </button>
+    
 
   <!-- NOTIFICATION TOAST -->
   <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-2xl flex items-center gap-2 transition-all opacity-0 pointer-events-none z-50 no-print">
@@ -2791,8 +2715,17 @@ function handleScalePhoto(event) {
   reader.readAsDataURL(file);
 }
 
+function triggerDirectCameraUpload() {
+  const input = document.getElementById('scale-camera-input');
+  if (input) {
+    input.value = '';
+    input.click();
+  }
+}
+
 function renderScalePhotoPreview() {
   const container = document.getElementById('scale-photo-preview-container');
+  const actionButtons = document.getElementById('scale-photo-action-buttons');
   const imgElem = document.getElementById('scale-photo-preview-img');
   const timeElem = document.getElementById('scale-photo-timestamp');
 
@@ -2802,9 +2735,11 @@ function renderScalePhotoPreview() {
     imgElem.src = currentScalePhoto;
     if (timeElem) timeElem.innerText = 'Waktu Foto: ' + (currentScalePhotoTime || '-');
     container.classList.remove('hidden');
+    if (actionButtons) actionButtons.classList.add('hidden');
   } else {
     imgElem.src = '';
     container.classList.add('hidden');
+    if (actionButtons) actionButtons.classList.remove('hidden');
   }
 }
 
