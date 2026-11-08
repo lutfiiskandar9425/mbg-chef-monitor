@@ -27,3 +27,4 @@ for src, name in uploaded_files.items():
         print(f"Err {name}: {res.stderr.strip()}")
 
 print("All Tuesday PDFs copied and uploaded successfully!")
+

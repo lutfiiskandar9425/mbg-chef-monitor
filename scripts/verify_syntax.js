@@ -28,3 +28,4 @@ files.forEach(file => {
     console.log(`[PASS] ${file}: All ${scriptIdx} inline scripts parsed successfully without syntax errors.`);
   }
 });
+

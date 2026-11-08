@@ -33,3 +33,4 @@ for fn in files:
         f.write(c)
 
     print(f"Updated {fn}")
+

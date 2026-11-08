@@ -9,3 +9,4 @@ print(c[idx1:idx1+1400])
 idx2 = c.find('function openFullDirectiveModal')
 print('=== openFullDirectiveModal ===')
 print(c[idx2:idx2+2000])
+
