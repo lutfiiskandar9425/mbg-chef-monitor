@@ -1,3 +1,6 @@
+import 'package:webview_flutter_android/webview_flutter_android.dart' as android_webview;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -63,9 +66,6 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
       ..setBackgroundColor(const Color(0xFFF8FAFC))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPlatformPermissionRequest: (PlatformPermissionRequest request) {
-            request.grant();
-          },
           onPageStarted: (String url) {
             if (mounted) {
               setState(() {
@@ -87,6 +87,7 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
         ),
       );
 
+    _initFileSelector();
     _loadFreshUrl();
   }
 
@@ -102,6 +103,27 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
     if (state == AppLifecycleState.resumed) {
       _refreshData();
     }
+  }
+
+  Future<void> _initFileSelector() async {
+    try {
+      if (Platform.isAndroid && _controller.platform is android_webview.AndroidWebViewController) {
+        final androidController = _controller.platform as android_webview.AndroidWebViewController;
+        await androidController.setOnShowFileSelector((android_webview.FileSelectorParams params) async {
+          final picker = ImagePicker();
+          final bool useCamera = params.isCaptureEnabled;
+          final XFile? photo = await picker.pickImage(
+            source: useCamera ? ImageSource.camera : ImageSource.gallery,
+            imageQuality: 85,
+          );
+          if (photo != null) {
+            final uri = Uri.file(photo.path).toString();
+            return [uri];
+          }
+          return [];
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadFreshUrl() async {
@@ -129,7 +151,8 @@ class _MbgWebMonitorScreenState extends State<MbgWebMonitorScreen> with WidgetsB
       await _controller.clearLocalStorage();
     } catch (_) {}
 
-    await _loadFreshUrl();
+    await _initFileSelector();
+    _loadFreshUrl();
   }
 
   @override

@@ -351,24 +351,23 @@
           <p id="scale-subtext" class="text-xs text-slate-400 mt-1 font-semibold">Netto Bersih Bahan Siap Olah</p>
         </div>
 
-                                        <!-- BUKTI FOTO TIMBANGAN (SIMPEL & ELEGAN) -->
+                                                <!-- BUKTI FOTO TIMBANGAN (KAMERA & GALERI ASLI) -->
         <div class="pt-3 border-t border-slate-800/80 space-y-2">
-          <!-- Input File Tersembunyi (Standar Browser & Seluler) -->
-          <input type="file" id="scale-camera-input" accept="image/*" style="display: none;" onchange="handleScalePhoto(event)">
-
           <!-- Tombol Aksi Foto (Tampil Saat Belum Ada Foto) -->
           <div id="scale-photo-action-buttons" class="grid grid-cols-2 gap-2">
-            <!-- Tombol 1: Buka Kamera / Galeri -->
-            <button type="button" onclick="triggerDirectCameraUpload()" class="py-2.5 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
-              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              <span>Buka Kamera (Foto)</span>
-            </button>
+            <!-- Tombol 1: Buka Kamera Fisik Langsung -->
+            <div class="relative overflow-hidden py-3 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 select-none">
+              <input type="file" id="scale-camera-input" accept="image/*" capture="environment" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleScalePhoto(event)">
+              <svg class="w-4 h-4 shrink-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2-0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="pointer-events-none font-bold">Buka Kamera</span>
+            </div>
 
-            <!-- Tombol 2: Foto Digital Cepat (1-Sentuhan) -->
-            <button type="button" onclick="useDigitalScaleSamplePhoto()" class="py-2.5 px-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98">
-              <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-              <span>Foto Digital Cepat</span>
-            </button>
+            <!-- Tombol 2: Ambil dari Galeri HP / Album -->
+            <div class="relative overflow-hidden py-3 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 select-none">
+              <input type="file" id="scale-gallery-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleScalePhoto(event)">
+              <svg class="w-4 h-4 text-emerald-400 shrink-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="pointer-events-none font-bold">Pilih Galeri</span>
+            </div>
           </div>
 
           <!-- CONTAINER PREVIEW FOTO BUKTI TIMBANGAN (Tampil Saat Sudah Ada Foto) -->
@@ -2746,6 +2745,10 @@ function renderScalePhotoPreview() {
 function removeScalePhoto() {
   currentScalePhoto = null;
   currentScalePhotoTime = '';
+  const camInput = document.getElementById('scale-camera-input');
+  if (camInput) camInput.value = '';
+  const galInput = document.getElementById('scale-gallery-input');
+  if (galInput) galInput.value = '';
   renderScalePhotoPreview();
   showToast('Foto timbangan dihapus');
 }
