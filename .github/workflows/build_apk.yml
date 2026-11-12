@@ -111,13 +111,4 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Publish Direct Download APK Release
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk --clobber || \
-          gh release create v1.0.0 mbg_chef_monitor/build/app/outputs/flutter-apk/MBG-Chef-Monitor-SPPG.apk \
-            --title "MBG Chef Monitor v1.0.0" \
-            --notes "Aplikasi Android MBG Chef Monitor (Release APK) siap pakai." \
-            --clobber || true
+
