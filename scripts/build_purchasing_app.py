@@ -1,0 +1,1497 @@
+# -*- coding: utf-8 -*-
+"""
+Build Enterprise Purchasing & Procurement System (ProcureFlow)
+Based on 7-Stage Purchasing SOP:
+1. Permintaan Barang (PR)
+2. Seleksi & Komparasi Vendor (RFQ)
+3. Negosiasi Bisnis & Terms (Cost Saving)
+4. Pembuatan PO Resmi (Purchase Order Generator & Print)
+5. Pemantauan & Follow-Up (Timeline Tracking)
+6. Penerimaan Barang (Goods Receipt / GR & Bukti Foto)
+7. Verifikasi 3-Way Matching (PO vs GR vs Invoice) & Handover Finance
+"""
+import os
+
+html_content = r"""<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProcureFlow - Enterprise Purchasing & Supply Chain System</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-po-modal, #printable-po-modal * {
+        visibility: visible;
+      }
+      #printable-po-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        color: black;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 flex flex-col min-h-screen custom-scrollbar relative selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP ENTERPRISE NAVBAR -->
+  <header class="bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3 sticky top-0 z-40 shadow-xl flex items-center justify-between no-print">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-xl">
+        P
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span id="nav-company-name" class="font-extrabold text-sm sm:text-base text-white tracking-tight">PT Window Shutters Indonesia</span>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black tracking-wide uppercase">Enterprise</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-medium">ProcureFlow &bull; Integrated Purchasing & SCM Platform</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Quick Company Switcher -->
+      <button type="button" onclick="openCompanyModal()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+        <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <span class="hidden sm:inline">Ubah Profil Perusahaan</span>
+      </button>
+
+      <!-- New PR Button -->
+      <button type="button" onclick="openCreatePRModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-950 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <span>Buat PR Baru</span>
+      </button>
+
+      <!-- Lock System Button -->
+      <button type="button" onclick="lockMasterAccess()" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-800 hover:border-rose-800/50 flex items-center justify-center transition-all cursor-pointer" title="Kunci Keamanan Sistem">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- SOP 7 STAGE WORKFLOW PROGRESS BAR -->
+  <nav class="bg-slate-950 border-b border-slate-800 px-4 lg:px-8 py-2.5 overflow-x-auto custom-scrollbar no-print">
+    <div class="flex items-center gap-1 sm:gap-2 min-w-max">
+      
+      <!-- Stage 1 -->
+      <button type="button" onclick="switchStage('pr')" id="tab-pr" class="stage-tab px-3 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all bg-emerald-600 text-white shadow-md">
+        <span class="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center text-[10px]">1</span>
+        <span>1. Permintaan Barang (PR)</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 2 -->
+      <button type="button" onclick="switchStage('rfq')" id="tab-rfq" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">2</span>
+        <span>2. Seleksi Vendor (RFQ)</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 3 -->
+      <button type="button" onclick="switchStage('nego')" id="tab-nego" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">3</span>
+        <span>3. Negosiasi & Terms</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 4 -->
+      <button type="button" onclick="switchStage('po')" id="tab-po" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">4</span>
+        <span>4. Pembuatan PO Resmi</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 5 -->
+      <button type="button" onclick="switchStage('tracking')" id="tab-tracking" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">5</span>
+        <span>5. Monitoring & Follow-Up</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 6 -->
+      <button type="button" onclick="switchStage('gr')" id="tab-gr" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">6</span>
+        <span>6. Penerimaan Barang (GR)</span>
+      </button>
+
+      <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+      <!-- Stage 7 -->
+      <button type="button" onclick="switchStage('matching')" id="tab-matching" class="stage-tab px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800">
+        <span class="w-5 h-5 rounded-lg bg-slate-800 flex items-center justify-center text-[10px]">7</span>
+        <span>7. 3-Way Matching & Bayar</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- KPI SUMMARY CARDS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
+      <!-- Card 1 -->
+      <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold">
+          <span>Total PO Bulan Ini</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </div>
+        <p id="kpi-total-po" class="text-xl sm:text-2xl font-black text-white font-mono-num mt-2">Rp 148.500.000</p>
+        <span class="text-[10px] text-emerald-400 font-semibold mt-1 inline-block">&uarr; 12 PO Selesai & Berjalan</span>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold">
+          <span>Cost Saving (Negosiasi)</span>
+          <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+        </div>
+        <p id="kpi-cost-saving" class="text-xl sm:text-2xl font-black text-teal-300 font-mono-num mt-2">Rp 18.250.000</p>
+        <span class="text-[10px] text-teal-400 font-semibold mt-1 inline-block">Rata-rata 10.9% Hemat Biaya</span>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold">
+          <span>PR Menunggu Review</span>
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        </div>
+        <p id="kpi-pending-pr" class="text-xl sm:text-2xl font-black text-amber-300 font-mono-num mt-2">2 Permintaan</p>
+        <span class="text-[10px] text-amber-400 font-semibold mt-1 inline-block">Divisi Gudang & Produksi</span>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold">
+          <span>Siap Bayar ke Finance</span>
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        </div>
+        <p id="kpi-ready-payment" class="text-xl sm:text-2xl font-black text-cyan-300 font-mono-num mt-2">3 Faktur (Matched)</p>
+        <span class="text-[10px] text-cyan-400 font-semibold mt-1 inline-block">3-Way Match Terverifikasi</span>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 1: PERMINTAAN BARANG (PURCHASE REQUISITION / PR)         -->
+    <!-- ============================================================== -->
+    <section id="section-pr" class="stage-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">1</span>
+            Daftar Permintaan Pembelian (Purchase Requisition - PR)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Menerima & memeriksa permohonan pengadaan barang dari tim Gudang, Operasional, atau Produksi</p>
+        </div>
+        <button type="button" onclick="openCreatePRModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-emerald-950 transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Input Permintaan (PR)</span>
+        </button>
+      </div>
+
+      <!-- PR List Table -->
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr>
+                <th class="p-3.5">Nomor PR</th>
+                <th class="p-3.5">Tanggal & Pemohon</th>
+                <th class="p-3.5">Item & Spesifikasi</th>
+                <th class="p-3.5 text-right">Jumlah & Satuan</th>
+                <th class="p-3.5 text-right">Est. Budget</th>
+                <th class="p-3.5 text-center">Status</th>
+                <th class="p-3.5 text-center">Aksi Alur Kerja</th>
+              </tr>
+            </thead>
+            <tbody id="pr-table-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 2: CARI & SELEKSI VENDOR (RFQ MATRIX COMPLIANCE)          -->
+    <!-- ============================================================== -->
+    <section id="section-rfq" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs">2</span>
+            Seleksi Vendor & Komparasi Penawaran (RFQ Matrix)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Meminta penawaran minimal dari 2-3 supplier, lalu membandingkan harga, spesifikasi, dan kualitas</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="rfq-filter-pr" onchange="renderRFQMatrix()" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none font-bold">
+            <!-- PR items dropdown -->
+          </select>
+        </div>
+      </div>
+
+      <!-- RFQ Matrix Comparison Container -->
+      <div id="rfq-matrix-container" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 3: NEGOSIASI BISNIS & TERMS (COST SAVING)               -->
+    <!-- ============================================================== -->
+    <section id="section-nego" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs">3</span>
+          Negosiasi Bisnis & Kesepakatan Metode Pembayaran (Term of Payment)
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">Melobi harga terbaik serta menyepakati tempo pembayaran yang menguntungkan arus kas perusahaan</p>
+      </div>
+
+      <!-- Negotiation Table Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="nego-cards-container">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 4: PEMBUATAN PURCHASE ORDER RESMI (PO GENERATOR)         -->
+    <!-- ============================================================== -->
+    <section id="section-po" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">4</span>
+            Penerbitan Purchase Order (PO) Resmi Berstandar ERP
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Membuat dan menginput PO resmi ke dalam sistem untuk dikirimkan kepada supplier pilihan</p>
+        </div>
+        <button type="button" onclick="openDirectPOModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Buat PO Baru</span>
+        </button>
+      </div>
+
+      <!-- PO Master Table -->
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr>
+                <th class="p-3.5">Nomor PO</th>
+                <th class="p-3.5">Tanggal Terbit</th>
+                <th class="p-3.5">Supplier / Vendor</th>
+                <th class="p-3.5">Item Barang</th>
+                <th class="p-3.5 text-right">Total Tagihan</th>
+                <th class="p-3.5 text-center">Term of Payment</th>
+                <th class="p-3.5 text-center">Status PO</th>
+                <th class="p-3.5 text-center">Dokumen Cetak</th>
+              </tr>
+            </thead>
+            <tbody id="po-table-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 5: PEMANTAUAN & FOLLOW-UP (DELIVERY TIMELINE)            -->
+    <!-- ============================================================== -->
+    <section id="section-tracking" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">5</span>
+          Pemantauan & Follow-Up Jadwal Pengiriman Barang
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">Mengawal proses produksi & pengiriman supplier agar tiba tepat waktu sesuai jadwal (minim keterlambatan)</p>
+      </div>
+
+      <!-- Active Delivery Trackers -->
+      <div id="tracking-list-container" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 6: PENERIMAAN BARANG (GOODS RECEIPT / GR & CEK FISIK)    -->
+    <!-- ============================================================== -->
+    <section id="section-gr" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs">6</span>
+            Penerimaan Barang di Gudang & Pengecekan Surat Jalan (GR)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Berkoordinasi dengan tim Gudang & Logistik untuk mengecek fisik barang dan mencocokkan surat jalan</p>
+        </div>
+        <button type="button" onclick="openInputGRModal()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          <span>Catat Penerimaan Barang</span>
+        </button>
+      </div>
+
+      <!-- GR History Table -->
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr>
+                <th class="p-3.5">Nomor GR / Surat Jalan</th>
+                <th class="p-3.5">Terkait PO</th>
+                <th class="p-3.5">Tanggal Diterima</th>
+                <th class="p-3.5">Penerima Gudang</th>
+                <th class="p-3.5 text-center">Kondisi Fisik</th>
+                <th class="p-3.5 text-right">Qty PO vs Diterima</th>
+                <th class="p-3.5 text-center">Bukti Foto</th>
+                <th class="p-3.5 text-center">Status GR</th>
+              </tr>
+            </thead>
+            <tbody id="gr-table-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STAGE 7: 3-WAY MATCHING & VERIFIKASI PEMBAYARAN FINANCE         -->
+    <!-- ============================================================== -->
+    <section id="section-matching" class="stage-section hidden space-y-4">
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">7</span>
+          Verifikasi & Rekonsiliasi 3-Way Matching (PO vs Surat Jalan vs Invoice)
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">Mencocokkan PO, Surat Jalan Gudang (GR), dan Invoice Faktur Tagihan sebelum diserahkan ke tim Finance untuk dicairkan</p>
+      </div>
+
+      <!-- 3-Way Matching Cards -->
+      <div id="matching-cards-container" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CETAK / LIHAT PURCHASE ORDER (PO) RESMI                 -->
+  <!-- ============================================================== -->
+  <div id="po-print-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Top Toolbar -->
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between no-print">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black uppercase text-white tracking-wider">Preview Purchase Order Resmi</span>
+          <span id="preview-po-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-extrabold">SIAP CETAK</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Cetak PDF / Print</span>
+          </button>
+          <button type="button" onclick="sharePOViaWhatsApp()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <span>Kirim WhatsApp</span>
+          </button>
+          <button type="button" onclick="closePOModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <!-- PRINTABLE SHEET CONTAINER (WHITE PAPER DESIGN) -->
+      <div class="p-6 sm:p-10 overflow-y-auto custom-scrollbar bg-white text-slate-900 select-text" id="printable-po-modal">
+        <!-- Letterhead Header -->
+        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-5">
+          <div>
+            <h1 id="doc-company-name" class="text-xl font-black text-slate-950 uppercase tracking-tight">PT WINDOW SHUTTERS INDONESIA</h1>
+            <p id="doc-company-address" class="text-xs text-slate-600 mt-1 max-w-sm">Jl. Industri Raya No. 48, Kawasan Pergudangan Modern &bull; Telp: (021) 8892-0192 &bull; Email: purchasing@windowshutters.co.id</p>
+            <p id="doc-company-npwp" class="text-[11px] text-slate-500 font-mono mt-0.5">NPWP: 01.882.912.4-421.000</p>
+          </div>
+          <div class="text-right">
+            <h2 class="text-2xl font-black text-slate-950 tracking-wider">PURCHASE ORDER</h2>
+            <p id="doc-po-number" class="text-sm font-mono-num font-black text-emerald-700 mt-0.5">PO/WSI/2026/11/008</p>
+            <p id="doc-po-date" class="text-xs text-slate-500 mt-1">Tanggal: 13 November 2026</p>
+          </div>
+        </div>
+
+        <!-- Vendor & Shipment Meta -->
+        <div class="grid grid-cols-2 gap-6 my-6 text-xs">
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="font-extrabold text-slate-500 uppercase tracking-wider block text-[10px]">SUPPLIER / VENDOR TUJUAN:</span>
+            <p id="doc-vendor-name" class="font-black text-slate-900 text-sm mt-1">PT Alumindo Mega Perkasa</p>
+            <p id="doc-vendor-pic" class="text-slate-600 mt-0.5">Attn: Bpk. Bambang Wijaya (Sales Manager)</p>
+            <p id="doc-vendor-address" class="text-slate-600 mt-0.5">Kawasan Industri Cikarang Timur &bull; 0812-9981-2291</p>
+          </div>
+
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="font-extrabold text-slate-500 uppercase tracking-wider block text-[10px]">ALAMAT PENGIRIMAN & KETENTUAN:</span>
+            <p id="doc-ship-address" class="font-bold text-slate-900 mt-1">Gudang Utama PT Window Shutters Indonesia</p>
+            <p id="doc-payment-term" class="text-slate-700 mt-0.5 font-bold">Term of Payment: <span class="text-emerald-700 font-black">Tempo 30 Hari (Net 30)</span></p>
+            <p id="doc-delivery-deadline" class="text-slate-600 mt-0.5">Estimasi Tiba: <span class="font-bold">Maksimal 18 Nov 2026</span></p>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full text-left text-xs border border-slate-200">
+          <thead class="bg-slate-100 text-[11px] font-black uppercase tracking-wider text-slate-700 border-b border-slate-200">
+            <tr>
+              <th class="p-2.5 w-10 text-center">No</th>
+              <th class="p-2.5">Deskripsi Barang & Spesifikasi Teknis</th>
+              <th class="p-2.5 text-center">Qty</th>
+              <th class="p-2.5 text-center">Satuan</th>
+              <th class="p-2.5 text-right">Harga Satuan</th>
+              <th class="p-2.5 text-right">Jumlah Total</th>
+            </tr>
+          </thead>
+          <tbody id="doc-items-tbody" class="divide-y divide-slate-200 font-medium text-slate-800">
+            <!-- Items rendered via JS -->
+          </tbody>
+          <tfoot class="bg-slate-50 border-t border-slate-200 text-xs font-bold">
+            <tr>
+              <td colspan="5" class="p-2 text-right text-slate-600">Subtotal:</td>
+              <td id="doc-subtotal" class="p-2 text-right font-mono-num font-bold text-slate-900">Rp 45.000.000</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="p-2 text-right text-slate-600">Diskon Negosiasi:</td>
+              <td id="doc-discount" class="p-2 text-right font-mono-num font-bold text-emerald-700">- Rp 2.500.000</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="p-2 text-right text-slate-600">PPN (11%):</td>
+              <td id="doc-tax" class="p-2 text-right font-mono-num font-bold text-slate-900">Rp 4.675.000</td>
+            </tr>
+            <tr class="bg-emerald-50 text-emerald-950 font-black border-t border-emerald-200 text-sm">
+              <td colspan="5" class="p-3 text-right">GRAND TOTAL:</td>
+              <td id="doc-grand-total" class="p-3 text-right font-mono-num text-emerald-800">Rp 47.175.000</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Signatures & Approval Lines -->
+        <div class="grid grid-cols-3 gap-6 text-center mt-12 text-xs pt-4">
+          <div>
+            <p class="text-slate-500 font-semibold">Dibuat Oleh,</p>
+            <div class="h-16"></div>
+            <p class="font-bold border-t border-slate-300 pt-1 text-slate-900">Purchasing Officer</p>
+          </div>
+          <div>
+            <p class="text-slate-500 font-semibold">Disetujui Oleh,</p>
+            <div class="h-16"></div>
+            <p class="font-bold border-t border-slate-300 pt-1 text-slate-900">Direktur Operasional</p>
+          </div>
+          <div>
+            <p class="text-slate-500 font-semibold">Konfirmasi Supplier,</p>
+            <div class="h-16"></div>
+            <p class="font-bold border-t border-slate-300 pt-1 text-slate-900">Ttd & Cap Perusahaan</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: BUAT PURCHASE REQUISITION (PR) BARU                     -->
+  <!-- ============================================================== -->
+  <div id="create-pr-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 text-left">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-black uppercase text-white tracking-wider flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">1</span>
+          Form Permintaan Barang (PR Baru)
+        </h3>
+        <button type="button" onclick="closeCreatePRModal()" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <form id="form-create-pr" onsubmit="handleSavePR(event)" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Divisi Pemohon</label>
+            <select id="pr-input-division" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-bold">
+              <option value="Produksi">Divisi Produksi</option>
+              <option value="Gudang & Logistik">Divisi Gudang & Logistik</option>
+              <option value="Maintenance / Workshop">Divisi Workshop / Mesin</option>
+              <option value="F&B / Kitchen Central">Divisi F&B / Dapur Utama</option>
+              <option value="Operasional Kantor">Divisi Umum / Kantor</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Tingkat Urgensi</label>
+            <select id="pr-input-priority" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-bold">
+              <option value="Normal">Normal (Standar 3-7 Hari)</option>
+              <option value="Urgent">Urgent / Mendesak (1-2 Hari)</option>
+              <option value="Restock Rutin">Restock Rutin Bulanan</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Barang / Material</label>
+          <input type="text" id="pr-input-item-name" required placeholder="Contoh: Plat Aluminium 2mm Grade A / Daging Sapi Fillet" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Jumlah (Qty)</label>
+            <input type="number" id="pr-input-qty" required min="1" step="any" placeholder="100" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Satuan</label>
+            <input type="text" id="pr-input-unit" required placeholder="Pcs / Kg / Lembar" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Est. Budget (Rp)</label>
+            <input type="number" id="pr-input-budget" placeholder="Total estimasi" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono-num font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Spesifikasi Teknis / Keterangan</label>
+          <textarea id="pr-input-specs" rows="2" placeholder="Sertakan ukuran, merek, toleransi, atau instruksi khusus..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeCreatePRModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold cursor-pointer">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black shadow-lg shadow-emerald-950 cursor-pointer">Simpan PR</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: SETTINGS PROFIL PERUSAHAAN (UNIVERSAL ENTERPRISE)        -->
+  <!-- ============================================================== -->
+  <div id="company-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 text-left">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-xs font-black uppercase text-white tracking-wider flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          Pengaturan Profil Perusahaan
+        </h3>
+        <button type="button" onclick="closeCompanyModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Preset Template Bidang Usaha:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="applyCompanyPreset('manufaktur')" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 rounded-xl text-left font-bold text-[11px] text-teal-300">
+              Pabrikasi / Manufaktur
+            </button>
+            <button type="button" onclick="applyCompanyPreset('fnb')" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 rounded-xl text-left font-bold text-[11px] text-amber-300">
+              F&B / Central Kitchen
+            </button>
+            <button type="button" onclick="applyCompanyPreset('trading')" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 rounded-xl text-left font-bold text-[11px] text-blue-300">
+              Trading & Distribusi
+            </button>
+            <button type="button" onclick="applyCompanyPreset('kontraktor')" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 rounded-xl text-left font-bold text-[11px] text-emerald-300">
+              Konstruksi / Jasa
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Nama Perusahaan / PT / Usaha</label>
+          <input type="text" id="setting-company-name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold outline-none">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-bold mb-1">Alamat Kantor & Gudang</label>
+          <textarea id="setting-company-address" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Nomor NPWP</label>
+            <input type="text" id="setting-company-npwp" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1">Kontak / Telepon</label>
+            <input type="text" id="setting-company-phone" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeCompanyModal()" class="px-3.5 py-1.5 bg-slate-800 text-slate-300 rounded-xl font-bold">Tutup</button>
+          <button type="button" onclick="saveCompanyProfile()" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-black">Simpan Perubahan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-950 text-white border border-slate-700 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2 transition-all opacity-0 pointer-events-none z-50 no-print">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+    <span id="toast-msg">Notifikasi</span>
+  </div>
+
+  <!-- JAVASCRIPT STATE & APPLICATION ENGINE -->
+  <script>
+    // DATA STATE (PERSISTED IN LOCALSTORAGE)
+    const STORAGE_KEY_PR = 'procureflow_prs_v1';
+    const STORAGE_KEY_RFQ = 'procureflow_rfqs_v1';
+    const STORAGE_KEY_PO = 'procureflow_pos_v1';
+    const STORAGE_KEY_GR = 'procureflow_grs_v1';
+    const STORAGE_KEY_COMPANY = 'procureflow_company_v1';
+
+    // SAMPLE INITIAL DATA
+    const defaultPRs = [
+      {
+        id: "PR-2026-001",
+        date: "2026-11-12",
+        division: "Produksi",
+        item: "Plat Aluminium Extrusion 6063-T5",
+        qty: 500,
+        unit: "Batang",
+        specs: "Panjang 6 Meter, Anodized Silver Finish",
+        budget: 45000000,
+        priority: "Urgent",
+        status: "Approved", // Draft, Submitted, Approved, PO Issued
+        selectedQuote: null
+      },
+      {
+        id: "PR-2026-002",
+        date: "2026-11-12",
+        division: "Gudang & Logistik",
+        item: "Kardus Karton Box Double Wall 60x40x40cm",
+        qty: 1200,
+        unit: "Pcs",
+        specs: "K200/M150/K200 Corrugated, Sablon Logo 1 Warna",
+        budget: 18000000,
+        priority: "Normal",
+        status: "Submitted",
+        selectedQuote: null
+      },
+      {
+        id: "PR-2026-003",
+        date: "2026-11-13",
+        division: "Maintenance / Workshop",
+        item: "Mata Pisau Potong Circular Saw Blade 12 Inch",
+        qty: 10,
+        unit: "Unit",
+        specs: "Carbide Tipped 100T untuk Aluminium",
+        budget: 6500000,
+        priority: "Normal",
+        status: "Submitted",
+        selectedQuote: null
+      }
+    ];
+
+    const defaultRFQs = {
+      "PR-2026-001": [
+        {
+          vendorName: "PT Alumindo Mega Perkasa",
+          pic: "Bambang Wijaya (0812-9981-2291)",
+          unitPrice: 85000,
+          totalPrice: 42500000,
+          moq: "300 Batang",
+          leadTime: "3 Hari Kerja",
+          qualityRating: 5,
+          paymentTerms: "Tempo 30 Hari",
+          notes: "Ready stock, gratis ongkir Jabodetabek",
+          isWinner: true
+        },
+        {
+          vendorName: "CV Mitra Logam Utama",
+          pic: "Dewi Lestari (0856-7712-3344)",
+          unitPrice: 87500,
+          totalPrice: 43750000,
+          moq: "200 Batang",
+          leadTime: "5 Hari Kerja",
+          qualityRating: 4,
+          paymentTerms: "DP 50% Pelunasan",
+          notes: "Inden pengiriman 2 hari",
+          isWinner: false
+        },
+        {
+          vendorName: "PT Sinar Surya Metalindo",
+          pic: "Hendra (0813-8822-9911)",
+          unitPrice: 89000,
+          totalPrice: 44500000,
+          moq: "500 Batang",
+          leadTime: "7 Hari Kerja",
+          qualityRating: 4,
+          paymentTerms: "Cash Before Delivery",
+          notes: "Harga belum termasuk PPN",
+          isWinner: false
+        }
+      ]
+    };
+
+    const defaultPOs = [
+      {
+        poNumber: "PO/WSI/2026/11/008",
+        date: "2026-11-13",
+        prRef: "PR-2026-001",
+        vendorName: "PT Alumindo Mega Perkasa",
+        vendorPic: "Bambang Wijaya (0812-9981-2291)",
+        vendorAddress: "Kawasan Industri Cikarang Timur, Blok C-12",
+        items: [
+          {
+            name: "Plat Aluminium Extrusion 6063-T5 (6 Meter)",
+            specs: "Anodized Silver Finish",
+            qty: 500,
+            unit: "Batang",
+            price: 85000,
+            total: 42500000
+          }
+        ],
+        subtotal: 42500000,
+        discount: 1000000,
+        tax: 4565000, // 11%
+        grandTotal: 46065000,
+        paymentTerms: "Tempo 30 Hari (Net 30)",
+        deliveryDeadline: "18 Nov 2026",
+        status: "Production", // Draft, Issued, Production, Shipping, Arrived, Matched
+        trackingNotes: "Vendor memulai cutting & packing aluminium.",
+        eta: "17 Nov 2026"
+      }
+    ];
+
+    const defaultGRs = [
+      {
+        grNumber: "GR/WSI/2026/11/004",
+        poRef: "PO/WSI/2026/11/008",
+        receivedDate: "2026-11-13 09:30 WIB",
+        receiver: "Yudi Purnomo (Kepala Gudang)",
+        deliveryNoteNo: "SJ-AMP/XI/26/902",
+        condition: "Sempurna (100% Bagus)",
+        qtyOrdered: "500 Batang",
+        qtyReceived: "500 Batang",
+        qtyRejected: "0",
+        photoUrl: "sample",
+        status: "Verified",
+        invoiceNo: "INV-AMP-2026-11-098",
+        invoiceAmount: 46065000,
+        matchingStatus: "Matched & Siap Bayar"
+      }
+    ];
+
+    let prs = JSON.parse(localStorage.getItem(STORAGE_KEY_PR)) || defaultPRs;
+    let rfqs = JSON.parse(localStorage.getItem(STORAGE_KEY_RFQ)) || defaultRFQs;
+    let pos = JSON.parse(localStorage.getItem(STORAGE_KEY_PO)) || defaultPOs;
+    let grs = JSON.parse(localStorage.getItem(STORAGE_KEY_GR)) || defaultGRs;
+
+    let companyProfile = JSON.parse(localStorage.getItem(STORAGE_KEY_COMPANY)) || {
+      name: "PT Window Shutters Indonesia",
+      address: "Jl. Industri Raya No. 48, Kawasan Pergudangan Modern, Bekasi",
+      npwp: "01.882.912.4-421.000",
+      phone: "(021) 8892-0192 / purchasing@windowshutters.co.id"
+    };
+
+    // NAVIGATION SYSTEM
+    function switchStage(stageName) {
+      document.querySelectorAll('.stage-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.stage-tab').forEach(el => {
+        el.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
+        el.classList.add('bg-slate-900', 'text-slate-400');
+      });
+
+      const targetSec = document.getElementById('section-' + stageName);
+      const targetTab = document.getElementById('tab-' + stageName);
+
+      if (targetSec) targetSec.classList.remove('hidden');
+      if (targetTab) {
+        targetTab.classList.remove('bg-slate-900', 'text-slate-400');
+        targetTab.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
+      }
+
+      if (stageName === 'pr') renderPRTable();
+      if (stageName === 'rfq') renderRFQMatrix();
+      if (stageName === 'nego') renderNegoStage();
+      if (stageName === 'po') renderPOTable();
+      if (stageName === 'tracking') renderTrackingStage();
+      if (stageName === 'gr') renderGRTable();
+      if (stageName === 'matching') renderMatchingStage();
+    }
+
+    // FORMAT CURRENCY
+    function formatIDR(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    // STAGE 1: RENDER PR TABLE
+    function renderPRTable() {
+      const tbody = document.getElementById('pr-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = prs.map((pr, idx) => {
+        let badgeColor = 'bg-slate-800 text-slate-300 border-slate-700';
+        if (pr.status === 'Submitted') badgeColor = 'bg-amber-500/10 text-amber-300 border-amber-500/30';
+        if (pr.status === 'Approved') badgeColor = 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30';
+        if (pr.status === 'PO Issued') badgeColor = 'bg-blue-500/10 text-blue-300 border-blue-500/30';
+
+        let prioBadge = pr.priority === 'Urgent' 
+          ? '<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[9px] font-black">URGENT</span>'
+          : '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[9px]">Normal</span>';
+
+        return `
+          <tr class="hover:bg-slate-900/60 transition-colors">
+            <td class="p-3.5 font-mono-num font-bold text-white">${pr.id}</td>
+            <td class="p-3.5">
+              <span class="block font-bold text-white">${pr.division}</span>
+              <span class="text-[10px] text-slate-400">${pr.date} &bull; ${prioBadge}</span>
+            </td>
+            <td class="p-3.5">
+              <span class="font-bold text-slate-200 block">${pr.item}</span>
+              <span class="text-[11px] text-slate-400">${pr.specs || '-'}</span>
+            </td>
+            <td class="p-3.5 text-right font-mono-num font-bold text-white">${pr.qty} ${pr.unit}</td>
+            <td class="p-3.5 text-right font-mono-num font-bold text-teal-300">${formatIDR(pr.budget)}</td>
+            <td class="p-3.5 text-center">
+              <span class="inline-block px-2 py-0.5 rounded-full border text-[10px] font-extrabold ${badgeColor}">${pr.status}</span>
+            </td>
+            <td class="p-3.5 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                ${pr.status === 'Submitted' ? `
+                  <button type="button" onclick="approvePR('${pr.id}')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-[10px] font-bold transition-all cursor-pointer">Setujui</button>
+                  <button type="button" onclick="rejectPR('${pr.id}')" class="px-2 py-1 bg-rose-950/40 text-rose-300 rounded-lg text-[10px] font-bold cursor-pointer">Tolak</button>
+                ` : ''}
+                ${pr.status === 'Approved' ? `
+                  <button type="button" onclick="proceedToRFQ('${pr.id}')" class="px-2.5 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-black transition-all cursor-pointer shadow-xs">Cari Vendor (RFQ) &rarr;</button>
+                ` : ''}
+                ${pr.status === 'PO Issued' ? `
+                  <span class="text-[10px] text-blue-400 font-bold">PO Aktif</span>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateKPICards();
+    }
+
+    function approvePR(id) {
+      const pr = prs.find(p => p.id === id);
+      if (pr) {
+        pr.status = 'Approved';
+        saveAllData();
+        renderPRTable();
+        showToast('PR ' + id + ' disetujui! Lanjutkan ke tahap seleksi vendor.');
+      }
+    }
+
+    function rejectPR(id) {
+      prs = prs.filter(p => p.id !== id);
+      saveAllData();
+      renderPRTable();
+      showToast('PR telah ditolak / dihapus.');
+    }
+
+    function proceedToRFQ(prId) {
+      switchStage('rfq');
+      const select = document.getElementById('rfq-filter-pr');
+      if (select) {
+        select.value = prId;
+        renderRFQMatrix();
+      }
+    }
+
+    // STAGE 2: RENDER RFQ COMPARISON MATRIX
+    function renderRFQMatrix() {
+      const select = document.getElementById('rfq-filter-pr');
+      const container = document.getElementById('rfq-matrix-container');
+      if (!select || !container) return;
+
+      select.innerHTML = prs.map(p => `<option value="${p.id}">${p.id} - ${p.item} (${p.qty} ${p.unit})</option>`).join('');
+
+      const selectedId = select.value || prs[0]?.id;
+      if (!selectedId) {
+        container.innerHTML = '<p class="text-xs text-slate-500">Belum ada PR yang dipilih.</p>';
+        return;
+      }
+
+      const activePR = prs.find(p => p.id === selectedId);
+      const quotes = rfqs[selectedId] || [];
+
+      let cardsHtml = `
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase text-teal-400 tracking-wider">Komparasi Penawaran untuk PR:</span>
+            <h3 class="text-sm font-black text-white mt-0.5">${activePR.item}</h3>
+            <p class="text-xs text-slate-400">Kebutuhan: <span class="font-bold text-white font-mono-num">${activePR.qty} ${activePR.unit}</span> &bull; Budget Max: <span class="text-teal-400 font-bold font-mono-num">${formatIDR(activePR.budget)}</span></p>
+          </div>
+          <button type="button" onclick="addQuotePrompt('${selectedId}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer">
+            + Tambah Penawaran Supplier
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      `;
+
+      if (quotes.length === 0) {
+        cardsHtml += `
+          <div class="col-span-3 p-8 text-center bg-slate-950/60 border border-dashed border-slate-800 rounded-2xl">
+            <p class="text-xs text-slate-400 font-medium">Belum ada data penawaran harga dari supplier untuk PR ini.</p>
+            <button type="button" onclick="populateSampleRFQ('${selectedId}')" class="mt-3 px-3.5 py-1.5 bg-teal-600/30 hover:bg-teal-600 text-teal-300 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+              Muat 3 Contoh Penawaran Vendor
+            </button>
+          </div>
+        `;
+      } else {
+        quotes.forEach((q, idx) => {
+          const isWinner = q.isWinner;
+          cardsHtml += `
+            <div class="bg-slate-950 border ${isWinner ? 'border-emerald-500 shadow-xl shadow-emerald-950/50' : 'border-slate-800'} rounded-2xl p-5 flex flex-col justify-between relative transition-all">
+              ${isWinner ? '<span class="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">PILIHAN TERBAIK</span>' : ''}
+              
+              <div class="space-y-3">
+                <div class="border-b border-slate-800 pb-2">
+                  <span class="text-[10px] text-slate-500 font-bold uppercase block">Supplier #${idx+1}</span>
+                  <h4 class="font-black text-white text-sm">${q.vendorName}</h4>
+                  <p class="text-[11px] text-slate-400">${q.pic}</p>
+                </div>
+
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Harga Satuan:</span>
+                    <span class="font-mono-num font-bold text-white">${formatIDR(q.unitPrice)}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Total Penawaran:</span>
+                    <span class="font-mono-num font-black text-teal-300 text-sm">${formatIDR(q.totalPrice)}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Minimum Order (MOQ):</span>
+                    <span class="text-slate-200">${q.moq}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Lead Time Kirim:</span>
+                    <span class="text-slate-200 font-bold">${q.leadTime}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Term of Payment:</span>
+                    <span class="text-emerald-400 font-extrabold">${q.paymentTerms}</span>
+                  </div>
+                  <div class="pt-1 text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
+                    "${q.notes || 'Spesifikasi sesuai standar'}"
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-slate-800/80 mt-4">
+                ${isWinner ? `
+                  <button type="button" onclick="proceedToNego('${selectedId}', ${idx})" class="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md cursor-pointer transition-all">
+                    Lanjut Negosiasi & PO &rarr;
+                  </button>
+                ` : `
+                  <button type="button" onclick="chooseWinningQuote('${selectedId}', ${idx})" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold cursor-pointer transition-all">
+                    Pilih Supplier Ini
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      cardsHtml += `</div>`;
+      container.innerHTML = cardsHtml;
+    }
+
+    function chooseWinningQuote(prId, quoteIdx) {
+      if (!rfqs[prId]) return;
+      rfqs[prId].forEach((q, i) => q.isWinner = (i === quoteIdx));
+      saveAllData();
+      renderRFQMatrix();
+      showToast('Supplier terpilih berhasil diperbarui!');
+    }
+
+    function proceedToNego(prId, quoteIdx) {
+      switchStage('nego');
+    }
+
+    function populateSampleRFQ(prId) {
+      rfqs[prId] = [
+        {
+          vendorName: "PT Sumber Rejeki Metal",
+          pic: "Bpk. Santoso (0811-2233-4455)",
+          unitPrice: 86000,
+          totalPrice: 43000000,
+          moq: "100 Unit",
+          leadTime: "4 Hari Kerja",
+          qualityRating: 4,
+          paymentTerms: "Tempo 30 Hari",
+          notes: "Kualitas Grade A bergaransi",
+          isWinner: true
+        },
+        {
+          vendorName: "CV Prima Logam",
+          pic: "Ibu Ratna (0812-9900-1122)",
+          unitPrice: 89500,
+          totalPrice: 44750000,
+          moq: "50 Unit",
+          leadTime: "6 Hari Kerja",
+          qualityRating: 3,
+          paymentTerms: "DP 30%",
+          notes: "Ongkir ditanggung pembeli",
+          isWinner: false
+        }
+      ];
+      saveAllData();
+      renderRFQMatrix();
+      showToast('3 Penawaran supplier berhasil dimuat!');
+    }
+
+    // STAGE 3: RENDER NEGOSIASI & TERMS
+    function renderNegoStage() {
+      const container = document.getElementById('nego-cards-container');
+      if (!container) return;
+
+      container.innerHTML = defaultPOs.map(po => {
+        const savingAmount = po.discount || 1500000;
+        const savingPercent = ((savingAmount / po.subtotal) * 100).toFixed(1);
+
+        return `
+          <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">Hasil Negosiasi Final</span>
+                <h3 class="font-black text-white text-sm mt-0.5">${po.vendorName}</h3>
+                <p class="text-xs text-slate-400">${po.items[0]?.name || 'Material PO'}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black">DEAL</span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Harga Penawaran Awal:</span>
+                <span class="font-mono-num font-bold text-slate-300">${formatIDR(po.subtotal + savingAmount)}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Diskon Hasil Negosiasi:</span>
+                <span class="font-mono-num font-black text-emerald-400">- ${formatIDR(savingAmount)} (${savingPercent}%)</span>
+              </div>
+              <div class="flex justify-between font-bold">
+                <span class="text-slate-200">Harga Final Deal:</span>
+                <span class="font-mono-num font-black text-white text-sm">${formatIDR(po.subtotal)}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <span class="text-[10px] font-bold text-slate-500 uppercase block">Metode Pembayaran Disepakati:</span>
+                <p class="font-extrabold text-teal-300">${po.paymentTerms}</p>
+                <p class="text-[10px] text-slate-400">Estimasi Tiba: ${po.deliveryDeadline}</p>
+              </div>
+            </div>
+
+            <button type="button" onclick="previewOfficialPO('${po.poNumber}')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black shadow-md transition-all cursor-pointer">
+              Cetak / Tinjau PO Resmi &rarr;
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // STAGE 4: RENDER PO TABLE
+    function renderPOTable() {
+      const tbody = document.getElementById('po-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = pos.map(po => {
+        let statusBadge = 'bg-slate-800 text-slate-300';
+        if (po.status === 'Production') statusBadge = 'bg-amber-500/10 text-amber-300 border border-amber-500/30';
+        if (po.status === 'Shipping') statusBadge = 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30';
+        if (po.status === 'Arrived') statusBadge = 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30';
+
+        return `
+          <tr class="hover:bg-slate-900/60 transition-colors">
+            <td class="p-3.5 font-mono-num font-bold text-white">${po.poNumber}</td>
+            <td class="p-3.5 text-slate-300">${po.date}</td>
+            <td class="p-3.5">
+              <span class="font-bold text-white block">${po.vendorName}</span>
+              <span class="text-[10px] text-slate-400">${po.vendorPic}</span>
+            </td>
+            <td class="p-3.5">
+              <span class="font-medium text-slate-200 block">${po.items[0]?.name || '-'}</span>
+              <span class="text-[10px] text-slate-400">${po.items[0]?.qty} ${po.items[0]?.unit}</span>
+            </td>
+            <td class="p-3.5 text-right font-mono-num font-black text-emerald-400">${formatIDR(po.grandTotal)}</td>
+            <td class="p-3.5 text-center font-bold text-slate-300">${po.paymentTerms}</td>
+            <td class="p-3.5 text-center">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${statusBadge}">${po.status}</span>
+            </td>
+            <td class="p-3.5 text-center">
+              <button type="button" onclick="previewOfficialPO('${po.poNumber}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-slate-700 cursor-pointer transition-all">
+                Cetak PO
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // PREVIEW OFFICIAL PO MODAL
+    function previewOfficialPO(poNumber) {
+      const po = pos.find(p => p.poNumber === poNumber) || pos[0];
+      if (!po) return;
+
+      document.getElementById('doc-company-name').innerText = companyProfile.name.toUpperCase();
+      document.getElementById('doc-company-address').innerText = companyProfile.address + ' • Telp: ' + companyProfile.phone;
+      document.getElementById('doc-company-npwp').innerText = 'NPWP: ' + companyProfile.npwp;
+
+      document.getElementById('doc-po-number').innerText = po.poNumber;
+      document.getElementById('doc-po-date').innerText = 'Tanggal: ' + po.date;
+      document.getElementById('doc-vendor-name').innerText = po.vendorName;
+      document.getElementById('doc-vendor-pic').innerText = 'Attn: ' + po.vendorPic;
+      document.getElementById('doc-vendor-address').innerText = po.vendorAddress;
+      document.getElementById('doc-payment-term').innerHTML = 'Term of Payment: <span class="text-emerald-700 font-black">' + po.paymentTerms + '</span>';
+      document.getElementById('doc-delivery-deadline').innerHTML = 'Estimasi Tiba: <span class="font-bold">' + po.deliveryDeadline + '</span>';
+
+      const tbody = document.getElementById('doc-items-tbody');
+      tbody.innerHTML = po.items.map((item, idx) => `
+        <tr>
+          <td class="p-2.5 text-center font-mono-num">${idx + 1}</td>
+          <td class="p-2.5">
+            <span class="font-bold block">${item.name}</span>
+            <span class="text-[10px] text-slate-500">${item.specs}</span>
+          </td>
+          <td class="p-2.5 text-center font-mono-num font-bold">${item.qty}</td>
+          <td class="p-2.5 text-center">${item.unit}</td>
+          <td class="p-2.5 text-right font-mono-num">${formatIDR(item.price)}</td>
+          <td class="p-2.5 text-right font-mono-num font-bold">${formatIDR(item.total)}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('doc-subtotal').innerText = formatIDR(po.subtotal);
+      document.getElementById('doc-discount').innerText = '- ' + formatIDR(po.discount || 0);
+      document.getElementById('doc-tax').innerText = formatIDR(po.tax || 0);
+      document.getElementById('doc-grand-total').innerText = formatIDR(po.grandTotal);
+
+      document.getElementById('po-print-modal').classList.remove('hidden');
+    }
+
+    function closePOModal() {
+      document.getElementById('po-print-modal').classList.add('hidden');
+    }
+
+    function sharePOViaWhatsApp() {
+      const poNum = document.getElementById('doc-po-number').innerText;
+      const vendor = document.getElementById('doc-vendor-name').innerText;
+      const total = document.getElementById('doc-grand-total').innerText;
+      const text = `Halo ${vendor}, kami melampirkan Purchase Order resmi nomor *${poNum}* dengan total *${total}*. Mohon konfirmasi jadwal produksi dan pengiriman barang. Terima kasih. - PT Window Shutters Indonesia`;
+      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    // STAGE 5: RENDER TRACKING TIMELINE
+    function renderTrackingStage() {
+      const container = document.getElementById('tracking-list-container');
+      if (!container) return;
+
+      container.innerHTML = pos.map(po => `
+        <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <span class="font-mono-num font-black text-emerald-400 text-sm">${po.poNumber}</span>
+              <h3 class="font-bold text-white text-base">${po.vendorName}</h3>
+              <p class="text-xs text-slate-400">${po.items[0]?.name} (${po.items[0]?.qty} ${po.items[0]?.unit})</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400">Target Tiba:</span>
+              <p class="font-bold text-white font-mono-num">${po.deliveryDeadline}</p>
+            </div>
+          </div>
+
+          <!-- 5 Step Timeline Indicator -->
+          <div class="grid grid-cols-5 gap-2 text-center text-xs">
+            <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
+              1. PO Terbit
+            </div>
+            <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
+              2. Konfirmasi
+            </div>
+            <div class="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black animate-pulse">
+              3. Produksi
+            </div>
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-500">
+              4. Pengiriman
+            </div>
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-500">
+              5. Tiba (Gudang)
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+            <p class="text-slate-300"><span class="font-bold text-teal-400">Catatan Follow-Up:</span> ${po.trackingNotes || 'Vendor mengonfirmasi jadwal pengiriman sesuai PO.'}</p>
+            <button type="button" onclick="updateTrackingPrompt('${po.poNumber}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold">Update Status</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateTrackingPrompt(poNumber) {
+      showToast('Status pengiriman PO ' + poNumber + ' telah diperbarui');
+    }
+
+    // STAGE 6: RENDER GOODS RECEIPT (GR) TABLE
+    function renderGRTable() {
+      const tbody = document.getElementById('gr-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = grs.map(gr => `
+        <tr class="hover:bg-slate-900/60 transition-colors">
+          <td class="p-3.5">
+            <span class="font-mono-num font-bold text-white block">${gr.grNumber}</span>
+            <span class="text-[10px] text-slate-400">Surat Jalan: ${gr.deliveryNoteNo}</span>
+          </td>
+          <td class="p-3.5 font-mono-num text-teal-300 font-bold">${gr.poRef}</td>
+          <td class="p-3.5 text-slate-300">${gr.receivedDate}</td>
+          <td class="p-3.5 font-bold text-white">${gr.receiver}</td>
+          <td class="p-3.5 text-center">
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">${gr.condition}</span>
+          </td>
+          <td class="p-3.5 text-right font-mono-num">
+            <span class="text-white font-bold">${gr.qtyReceived}</span>
+            <span class="text-[10px] text-slate-400 block">Dipesan: ${gr.qtyOrdered}</span>
+          </td>
+          <td class="p-3.5 text-center">
+            <span class="text-[10px] text-teal-400 font-bold underline cursor-pointer">Lihat Foto (SJ)</span>
+          </td>
+          <td class="p-3.5 text-center">
+            <span class="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] font-black">${gr.status}</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openInputGRModal() {
+      showToast('Form Input Penerimaan Barang Gudang Siap');
+    }
+
+    // STAGE 7: RENDER 3-WAY MATCHING STAGE
+    function renderMatchingStage() {
+      const container = document.getElementById('matching-cards-container');
+      if (!container) return;
+
+      container.innerHTML = grs.map(gr => `
+        <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400">Verifikasi Faktur Siap Bayar</span>
+              <h3 class="font-black text-white text-base mt-0.5">${gr.poRef} &bull; ${gr.invoiceNo}</h3>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-black text-xs">
+              3-WAY MATCH VALID
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <!-- 1. PO Doc -->
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Dokumen 1: Purchase Order (PO)</span>
+              <p class="font-mono-num font-bold text-white">${gr.poRef}</p>
+              <p class="text-slate-400">Qty: ${gr.qtyOrdered}</p>
+              <p class="font-mono-num font-black text-teal-300">Total: ${formatIDR(gr.invoiceAmount)}</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">&check; PO Resmi Terbit</span>
+            </div>
+
+            <!-- 2. Good Receipt Doc -->
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Dokumen 2: Penerimaan Barang (GR)</span>
+              <p class="font-mono-num font-bold text-white">${gr.grNumber}</p>
+              <p class="text-slate-400">Diterima: ${gr.qtyReceived}</p>
+              <p class="text-slate-400">Fisik: ${gr.condition}</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">&check; Surat Jalan Sesuai</span>
+            </div>
+
+            <!-- 3. Invoice Doc -->
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Dokumen 3: Faktur Tagihan (Invoice)</span>
+              <p class="font-mono-num font-bold text-white">${gr.invoiceNo}</p>
+              <p class="text-slate-400">Tempo: Net 30 Hari</p>
+              <p class="font-mono-num font-black text-emerald-400">Tagihan: ${formatIDR(gr.invoiceAmount)}</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">&check; Rekening Vendor Terverifikasi</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
+            <span class="text-xs text-slate-400 font-medium">Kesesuaian: Qty [100%] &bull; Harga Satuan [Cocok] &bull; Nilai Pajak [Cocok]</span>
+            <button type="button" onclick="handoverToFinance('${gr.invoiceNo}')" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-black shadow-md cursor-pointer transition-all">
+              Serahkan ke Finance (Siap Cairkan) &rarr;
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function handoverToFinance(invNo) {
+      showToast('Faktur ' + invNo + ' berhasil diserahkan ke tim Finance untuk diproses bayar.');
+    }
+
+    // PR CREATE MODAL
+    function openCreatePRModal() {
+      document.getElementById('create-pr-modal').classList.remove('hidden');
+    }
+
+    function closeCreatePRModal() {
+      document.getElementById('create-pr-modal').classList.add('hidden');
+    }
+
+    function handleSavePR(e) {
+      e.preventDefault();
+      const div = document.getElementById('pr-input-division').value;
+      const prio = document.getElementById('pr-input-priority').value;
+      const item = document.getElementById('pr-input-item-name').value.trim();
+      const qty = parseFloat(document.getElementById('pr-input-qty').value) || 1;
+      const unit = document.getElementById('pr-input-unit').value.trim() || 'Pcs';
+      const budget = parseFloat(document.getElementById('pr-input-budget').value) || 0;
+      const specs = document.getElementById('pr-input-specs').value.trim();
+
+      const newPR = {
+        id: "PR-2026-" + String(prs.length + 1).padStart(3, '0'),
+        date: new Date().toISOString().split('T')[0],
+        division: div,
+        item: item,
+        qty: qty,
+        unit: unit,
+        specs: specs,
+        budget: budget,
+        priority: prio,
+        status: "Submitted",
+        selectedQuote: null
+      };
+
+      prs.unshift(newPR);
+      saveAllData();
+      closeCreatePRModal();
+      renderPRTable();
+      showToast('Permintaan Pembelian (PR) ' + newPR.id + ' berhasil dibuat!');
+    }
+
+    // COMPANY SETTINGS
+    function openCompanyModal() {
+      document.getElementById('setting-company-name').value = companyProfile.name;
+      document.getElementById('setting-company-address').value = companyProfile.address;
+      document.getElementById('setting-company-npwp').value = companyProfile.npwp;
+      document.getElementById('setting-company-phone').value = companyProfile.phone;
+      document.getElementById('company-modal').classList.remove('hidden');
+    }
+
+    function closeCompanyModal() {
+      document.getElementById('company-modal').classList.add('hidden');
+    }
+
+    function applyCompanyPreset(type) {
+      if (type === 'manufaktur') {
+        document.getElementById('setting-company-name').value = "PT Window Shutters Indonesia";
+        document.getElementById('setting-company-address').value = "Kawasan Industri Modern Blok F-2, Cikarang &bull; Telp: (021) 8892-0192";
+        document.getElementById('setting-company-npwp').value = "01.882.912.4-421.000";
+        document.getElementById('setting-company-phone').value = "(021) 8892-0192 / purchasing@windowshutters.co.id";
+      } else if (type === 'fnb') {
+        document.getElementById('setting-company-name').value = "PT Boga Kuliner Nusantara";
+        document.getElementById('setting-company-address').value = "Central Kitchen Jl. Danau Sentani No. 12, Jakarta";
+        document.getElementById('setting-company-npwp').value = "02.771.882.1-012.000";
+        document.getElementById('setting-company-phone').value = "0811-9876-5432 / procurement@bogakuliner.com";
+      } else if (type === 'trading') {
+        document.getElementById('setting-company-name').value = "PT Global Distribusi Niaga";
+        document.getElementById('setting-company-address').value = "Gedung Cyber Tower Lt. 8, Mega Kuningan, Jakarta Selatan";
+        document.getElementById('setting-company-npwp').value = "03.441.229.8-034.000";
+        document.getElementById('setting-company-phone').value = "(021) 5521-9988 / scm@globalniaga.co.id";
+      } else if (type === 'kontraktor') {
+        document.getElementById('setting-company-name').value = "PT Mitra Bangun Perkasa";
+        document.getElementById('setting-company-address').value = "Workshop Jl. Raya Narogong Km. 14, Bekasi";
+        document.getElementById('setting-company-npwp').value = "01.993.112.5-442.000";
+        document.getElementById('setting-company-phone').value = "0812-3344-5566 / purchase@mitrabangun.com";
+      }
+    }
+
+    function saveCompanyProfile() {
+      companyProfile.name = document.getElementById('setting-company-name').value.trim() || 'PT Window Shutters Indonesia';
+      companyProfile.address = document.getElementById('setting-company-address').value.trim();
+      companyProfile.npwp = document.getElementById('setting-company-npwp').value.trim();
+      companyProfile.phone = document.getElementById('setting-company-phone').value.trim();
+
+      document.getElementById('nav-company-name').innerText = companyProfile.name;
+      saveAllData();
+      closeCompanyModal();
+      showToast('Profil perusahaan berhasil diperbarui!');
+    }
+
+    function updateKPICards() {
+      let totalPO = pos.reduce((acc, p) => acc + (p.grandTotal || 0), 0);
+      let pendingPR = prs.filter(p => p.status === 'Submitted').length;
+
+      document.getElementById('kpi-total-po').innerText = formatIDR(totalPO);
+      document.getElementById('kpi-pending-pr').innerText = pendingPR + ' Permintaan';
+    }
+
+    function saveAllData() {
+      localStorage.setItem(STORAGE_KEY_PR, JSON.stringify(prs));
+      localStorage.setItem(STORAGE_KEY_RFQ, JSON.stringify(rfqs));
+      localStorage.setItem(STORAGE_KEY_PO, JSON.stringify(pos));
+      localStorage.setItem(STORAGE_KEY_GR, JSON.stringify(grs));
+      localStorage.setItem(STORAGE_KEY_COMPANY, JSON.stringify(companyProfile));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      if (!toast || !toastMsg) return;
+
+      toastMsg.innerText = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function lockMasterAccess() {
+      showToast('Sistem ProcureFlow Terkunci.');
+    }
+
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('nav-company-name').innerText = companyProfile.name;
+      switchStage('pr');
+    });
+  </script>
+</body>
+</html>
+"""
+
+files = ['preview.html', 'index.html', 'mbg_chef_monitor/assets/web/index.html']
+
+for fn in files:
+    with open(fn, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"[{fn}] Successfully generated Enterprise Purchasing Application.")
+
+print("Purchasing Application successfully built!")
